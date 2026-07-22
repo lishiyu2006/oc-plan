@@ -1,0 +1,34 @@
+[
+  {
+    "id": "p-001",
+    "title": "山谷晨光",
+    "url": "https://picsum.photos/id/1015/1600/1067",
+    "date": "2025-05-18",
+    "album": "旅途",
+    "description": "示例照片。替换方法:用 PicGo 把照片上传到你的 GitHub 图床仓库,然后把 jsDelivr 链接( https://cdn.jsdelivr.net/gh/<user>/<image-repo>@<branch>/<path> )填到本条记录的 url 字段。"
+  },
+  {
+    "id": "p-002",
+    "title": "湖边黄昏",
+    "url": "https://picsum.photos/id/1016/1600/1067",
+    "date": "2025-05-10",
+    "album": "旅途",
+    "description": "示例照片,占位图来自 picsum.photos,正式发布前请替换为图床链接。"
+  },
+  {
+    "id": "p-003",
+    "title": "城市街角",
+    "url": "https://picsum.photos/id/1029/1600/1067",
+    "date": "2025-04-26",
+    "album": "日常",
+    "description": "示例照片,占位图来自 picsum.photos,正式发布前请替换为图床链接。"
+  },
+  {
+    "id": "p-004",
+    "title": "窗边绿植",
+    "url": "https://picsum.photos/id/106/1600/1067",
+    "date": "2025-04-13",
+    "album": "日常",
+    "description": "示例照片,占位图来自 picsum.photos,正式发布前请替换为图床链接。"
+  }
+]

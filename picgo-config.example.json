@@ -1,0 +1,25 @@
+{
+  "_说明": "PicGo GitHub 图床配置模板(picgo-plugin-github-plus 格式)。复制为 picgo-config.json 后填入真实值,或直接照此在 PicGo 设置界面中逐项填写。所有 <...> 均为需要替换的占位符。",
+  "picBed": {
+    "current": "githubPlus",
+    "uploader": "githubPlus",
+    "githubPlus": {
+      "repo": "<你的用户名>/<图片仓库名>",
+      "branch": "main",
+      "token": "<GitHub Personal Access Token,需 repo 权限>",
+      "path": "img/",
+      "customUrl": "https://cdn.jsdelivr.net/gh/<你的用户名>/<图片仓库名>@main",
+      "origin": "github"
+    }
+  },
+  "picgoPlugins": {
+    "picgo-plugin-github-plus": true
+  },
+  "_使用流程": [
+    "1. 在 GitHub 新建一个公开仓库专门存放图片(例如 my-photos),与本网站仓库分开。",
+    "2. GitHub Settings > Developer settings > Personal access tokens 生成 token(勾选 repo 权限)。",
+    "3. PicGo 安装 picgo-plugin-github-plus(或使用内置 github 图床,配置字段相同)。",
+    "4. 按上面模板填写 repo / branch / token / path / customUrl。",
+    "5. 上传照片后,把得到的 jsDelivr 链接填入本项目的 content/photos.json。"
+  ]
+}

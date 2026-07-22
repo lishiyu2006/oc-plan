@@ -1,0 +1,125 @@
+/* ========== 主题变量(主色调来自照片,严格使用) ========== */
+:root {
+  --rose-light: #f4d0c7;
+  --rose-mid: #e5a6a1;
+  --rose-deep: #c67a7a;
+
+  --bg: #faf5f3;
+  --surface: #ffffff;
+  --text: #2c2422;
+  --text-soft: #7a6a65;
+  --border: #eedfdd;
+  --accent: var(--rose-deep);
+  --accent-soft: var(--rose-light);
+  --shadow: 0 4px 24px rgba(198, 122, 122, 0.10);
+}
+
+[data-theme='dark'] {
+  --bg: #161210;
+  --surface: #1f1a18;
+  --text: #f2e9e6;
+  --text-soft: #b3a19c;
+  --border: #342925;
+  --accent: var(--rose-mid);
+  --accent-soft: #2e2320;
+  --shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+}
+
+/* ========== 基础 ========== */
+* { box-sizing: border-box; }
+
+html, body { margin: 0; padding: 0; }
+
+body {
+  font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+    -apple-system, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  transition: background 0.3s ease, color 0.3s ease;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; text-decoration: none; }
+
+img { display: block; max-width: 100%; }
+
+.page {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: clamp(1.5rem, 5vw, 4rem) clamp(1rem, 4vw, 2rem) 6rem;
+  min-height: calc(100vh - 64px);
+}
+
+/* ========== 通用卡片 ========== */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.card:hover { transform: translateY(-3px); }
+
+.card .thumb {
+  overflow: hidden;
+  border-radius: 16px 16px 0 0;
+}
+
+.card .thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.card:hover .thumb img { transform: scale(1.04); }
+
+.section-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin: 3rem 0 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.section-title::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  background: var(--accent);
+}
+
+/* ========== 路由过渡 ========== */
+.fade-enter-active, .fade-leave-active { transition: opacity 0.2s ease, transform 0.2s ease; }
+.fade-enter-from { opacity: 0; transform: translateY(8px); }
+.fade-leave-to { opacity: 0; }
+
+/* ========== 日记正文(marked 渲染) ========== */
+.prose { line-height: 1.9; font-size: 1.02rem; color: var(--text); }
+.prose h1, .prose h2, .prose h3 { line-height: 1.4; margin: 1.8em 0 0.7em; }
+.prose p { margin: 1em 0; }
+.prose blockquote {
+  margin: 1.5em 0;
+  padding: 0.8em 1.2em;
+  border-left: 4px solid var(--accent);
+  background: var(--accent-soft);
+  border-radius: 0 12px 12px 0;
+  color: var(--text-soft);
+}
+.prose img { border-radius: 14px; margin: 1.5em 0; }
+.prose ul, .prose ol { padding-left: 1.4em; }
+.prose code {
+  background: var(--accent-soft);
+  padding: 0.15em 0.4em;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+
+/* ========== 响应式 ========== */
+@media (max-width: 640px) {
+  .section-title { font-size: 1.15rem; }
+}
