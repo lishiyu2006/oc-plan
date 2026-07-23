@@ -53,8 +53,27 @@ function heightAt(x, z) {
   const qx = fbm(noise, x * 0.045 + 5.2, z * 0.045 + 1.3, 4)
   const qz = fbm(noise, x * 0.045 + 2.8, z * 0.045 + 8.1, 4)
   const base = fbm(noise, x * 0.045 + qx * 4.5, z * 0.045 + qz * 4.5, 6)
-  const dist = Math.sqrt(x * x + z * z) / 19
-  return base - 0.26 - dist * dist * 0.6
+  // 平滑径向衰减:r<9 保持原样,9→17 沉入深海,保证大陆四周完整环海
+  const dist = Math.sqrt(x * x + z * z)
+  const s = THREE.MathUtils.clamp((dist - 9) / 8, 0, 1)
+  const fall = s * s * (3 - 2 * s)
+  return base - 0.26 - fall * 1.15
+}
+
+// 霜语冰原范围(北境:染白、不种树)
+function inFrost(x, z) {
+  return x > -3 && x < 7 && z > -11 && z < -5
+}
+
+// ---------- 古境王门离岛(与大陆分离的第二块小陆地) ----------
+const ISLE = { x: 20, z: -8, r: 4.6 }
+function isleHeightAt(x, z) {
+  const dx = x - ISLE.x
+  const dz = z - ISLE.z
+  const d = Math.sqrt(dx * dx + dz * dz) / ISLE.r
+  if (d >= 1) return -0.5
+  const base = fbm(noise, x * 0.2 + 3.1, z * 0.2 + 7.7, 4)
+  return (base - 0.32) * 0.5 * (1 - d * d) + (1 - d * d) * 0.24
 }
 
 const H_SCALE = 6
@@ -71,8 +90,11 @@ const LAYER_LABEL = { sky: '天空 · SKY', surface: '地表 · SURFACE', underg
 const LAYER_VIEW = {
   surface: { pos: [0, 15, 24], tgt: [0, 0.5, 0] },
   sky: { pos: [0, 19.5, 21], tgt: [0, 14.2, 0] },
-  underground: { pos: [0, -11, 21], tgt: [0, -15.5, 0] },
+  // 地下相机放在洞顶背板(半径 22)之外俯视进入,避免穿模
+  underground: { pos: [0, -14, 30], tgt: [0, -16, 0] },
 }
+// 切层高空中继点:任何层切换都先升到这里,再下降进入目标层
+const SAFE_RELAY = { pos: [0, 26, 30], tgt: [0, 0, 0] }
 
 // ---------- 昼夜参数(映射:网站亮色主题 = 3D 白天,暗色主题 = 3D 黑夜) ----------
 const DAY = {
@@ -117,6 +139,8 @@ const reduced =
 
 let renderer, scene, camera, controls, clock, rafId = 0
 let hemi, dirLight, seaMesh, underSeaMesh, stars, particles, rimRain
+let gatePortal = null // 王门门内发光圆环
+let gateSky = null // 王门高空悬浮巨环(含浮动)
 let islands = []
 let markerGroups = {} // layer -> Group(含浮标 + point light)
 let gemsByLayer = { sky: [], surface: [], underground: [] }
@@ -192,7 +216,8 @@ function switchLayer(key) {
   focused = false
   for (const k of Object.keys(markerGroups)) markerGroups[k].visible = k === key
   const v = LAYER_VIEW[key]
-  flyTo(v.pos, v.tgt, 0.95)
+  // 两段式:先飞到高空中继点,再下降进入目标层,避免穿过地表/地下背板
+  flyTo(SAFE_RELAY.pos, SAFE_RELAY.tgt, 0.7, () => flyTo(v.pos, v.tgt, 0.85))
 }
 
 function focusRegion(region) {
@@ -225,7 +250,8 @@ function unfocus() {
 
 /* ---------- 场景搭建 ---------- */
 function buildTerrain() {
-  const geo = new THREE.PlaneGeometry(36, 36, 256, 256)
+  // 48×48:边缘伸到半径 24 的深海,地形平面边界藏进雾距,不与海面产生接缝
+  const geo = new THREE.PlaneGeometry(48, 48, 256, 256)
   geo.rotateX(-Math.PI / 2)
   const pos = geo.attributes.position
   const colors = new Float32Array(pos.count * 3)
@@ -235,7 +261,11 @@ function buildTerrain() {
     const z = pos.getZ(i)
     const h = heightAt(x, z)
     pos.setY(i, h * H_SCALE)
-    if (h < -0.16) c.set('#0b1f26')
+    if (inFrost(x, z) && h > -0.02) {
+      // 冰原:雪白 → 冰蓝微渐变,随噪声起伏
+      const g = noise(x * 0.35 + 9.1, z * 0.35 + 2.7)
+      c.setHSL(0.54 + g * 0.04, 0.16 + g * 0.14, 0.8 + g * 0.12)
+    } else if (h < -0.16) c.set('#0b1f26')
     else if (h < 0.0) c.set('#256069')
     else if (h < 0.05) c.set('#77806f')
     else if (h < 0.24) c.set('#4b5847')
@@ -271,6 +301,7 @@ function makeSea(size, y, segs) {
   )
   mesh.position.y = y
   mesh.userData.base = geo.attributes.position.array.slice()
+  mesh.frustumCulled = false
   scene.add(mesh)
   return mesh
 }
@@ -300,6 +331,7 @@ function buildTrees() {
     const z = (noise(9.1, tries * 0.53) - 0.5) * 32
     const h = heightAt(x, z)
     if (h < 0.05 || h > 0.3) continue
+    if (inFrost(x, z)) continue // 冰原不种树
     if (fbm(vegNoise, x * 0.1, z * 0.1, 3) < 0.48) continue
     // 避开地表板块标记
     if (regions.some((r) => r.layer === 'surface' && (r.x - x) ** 2 + (r.z - z) ** 2 < 4)) continue
@@ -314,6 +346,7 @@ function buildTrees() {
     placed++
   }
   inst.count = placed
+  inst.frustumCulled = false // 实例散布全大陆,包围球不可靠,防止拉近时被误剔除
   scene.add(inst)
 }
 
@@ -334,6 +367,7 @@ function buildCrystalCluster(cx, cz, color, n = 6, spread = 1.6) {
     const z = cz + (noise(cz, i * 2.3) - 0.5) * spread * 2
     gem.position.set(x, heightAt(x, z) * H_SCALE + s * 0.8, z)
     gem.rotation.set(noise(i, 1) * 0.6, noise(i, 2) * Math.PI, noise(i, 3) * 0.6)
+    gem.frustumCulled = false
     group.add(gem)
   }
   scene.add(group)
@@ -364,6 +398,7 @@ function buildParticles() {
       depthWrite: false,
     }),
   )
+  particles.frustumCulled = false
   scene.add(particles)
 }
 
@@ -393,16 +428,17 @@ function buildStars() {
       fog: false, // 星空在雾距之外,不受雾影响
     }),
   )
+  stars.frustumCulled = false
   scene.add(stars)
 }
 
 function buildRimRain() {
-  // 世界之界:大陆边缘一圈向下坠落的光雨
-  const n = 420
+  // 世界之界:环海之外、虚空边界一圈向下坠落的光雨
+  const n = 700
   const arr = new Float32Array(n * 3)
   for (let i = 0; i < n; i++) {
     const a = (i / n) * Math.PI * 2
-    const r = 17.3 + noise(i * 0.9, 1.1) * 1.6
+    const r = 25.3 + noise(i * 0.9, 1.1) * 1.8
     arr[i * 3] = Math.cos(a) * r
     arr[i * 3 + 1] = -12 + noise(i, 5.5) * 20
     arr[i * 3 + 2] = Math.sin(a) * r
@@ -413,13 +449,14 @@ function buildRimRain() {
     geo,
     new THREE.PointsMaterial({
       color: '#e8e4d8',
-      size: 0.13,
+      size: 0.3,
       transparent: true,
-      opacity: 0.6,
+      opacity: 0.85,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
     }),
   )
+  rimRain.frustumCulled = false
   scene.add(rimRain)
 }
 
@@ -466,6 +503,9 @@ function buildIsland(x, z, y, tall = false) {
     g.add(tower, lamp, beam)
   }
   g.position.set(x, y, z)
+  g.traverse((o) => {
+    o.frustumCulled = false
+  })
   scene.add(g)
   islands.push({ node: g, baseY: y })
   return g
@@ -489,9 +529,9 @@ function buildBridge(a, b) {
 }
 
 function buildUnderground() {
-  // 洞顶背板(地下的天空)
+  // 洞顶背板(地下的天空);半径 22,切层相机从背板外俯视进入,不穿模
   const ceiling = new THREE.Mesh(
-    new THREE.CircleGeometry(34, 32),
+    new THREE.CircleGeometry(22, 32),
     new THREE.MeshStandardMaterial({ color: '#0b0a12', roughness: 1 }),
   )
   ceiling.rotation.x = Math.PI / 2
@@ -515,7 +555,7 @@ function buildUnderground() {
   const col = new THREE.Color()
   for (let i = 0; i < n; i++) {
     const a = noise(i * 1.3, 2.2) * Math.PI * 2
-    const r = noise(7.7, i * 0.61) * 26
+    const r = noise(7.7, i * 0.61) * 18
     const s = 0.5 + noise(i, i * 3) * 1.6
     m.compose(
       new THREE.Vector3(Math.cos(a) * r, UNDER_DOME_Y - s * 1.1, Math.sin(a) * r),
@@ -525,6 +565,7 @@ function buildUnderground() {
     inst.setMatrixAt(i, m)
     inst.setColorAt(i, col.setHSL(0.72 + noise(i, 9) * 0.08, 0.4, 0.5 + noise(9, i) * 0.2))
   }
+  inst.frustumCulled = false
   scene.add(inst)
 
   // 晶穹点光(幽光感主光源之一)
@@ -554,7 +595,136 @@ function buildUnderground() {
     )
     glow.setMatrixAt(i, m)
   }
+  glow.frustumCulled = false
   scene.add(glow)
+}
+
+/* ---------- 古境王门离岛:独立小陆地 + 巨石之门 + 双环 ---------- */
+function buildIslet() {
+  const size = ISLE.r * 2 + 2
+  const geo = new THREE.PlaneGeometry(size, size, 48, 48)
+  geo.rotateX(-Math.PI / 2)
+  const pos = geo.attributes.position
+  const colors = new Float32Array(pos.count * 3)
+  const c = new THREE.Color()
+  for (let i = 0; i < pos.count; i++) {
+    const lx = pos.getX(i)
+    const lz = pos.getZ(i)
+    const h = isleHeightAt(ISLE.x + lx, ISLE.z + lz)
+    pos.setY(i, h * H_SCALE)
+    if (h < -0.16) c.set('#0b1f26')
+    else if (h < 0.0) c.set('#256069')
+    else if (h < 0.06) c.set('#8a8471') // 风化浅滩
+    else if (h < 0.26) c.set('#5c5f52')
+    else c.set('#6a675c') // 石灰岩顶
+    const j = (noise(lx * 3.1 + 40, lz * 3.1) - 0.5) * 0.05
+    colors[i * 3] = THREE.MathUtils.clamp(c.r + j, 0, 1)
+    colors[i * 3 + 1] = THREE.MathUtils.clamp(c.g + j, 0, 1)
+    colors[i * 3 + 2] = THREE.MathUtils.clamp(c.b + j, 0, 1)
+  }
+  geo.setAttribute('color', new THREE.BufferAttribute(colors, 3))
+  geo.computeVertexNormals()
+  const mesh = new THREE.Mesh(
+    geo,
+    new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 0.95 }),
+  )
+  mesh.position.set(ISLE.x, 0, ISLE.z)
+  mesh.frustumCulled = false
+  scene.add(mesh)
+}
+
+function buildKingsgate() {
+  const gy = Math.max(isleHeightAt(ISLE.x, ISLE.z), 0.06) * H_SCALE
+  const g = new THREE.Group()
+  g.position.set(ISLE.x, gy, ISLE.z)
+  g.rotation.y = Math.atan2(-ISLE.x, -ISLE.z) // 门面向大陆
+
+  const stoneMat = new THREE.MeshStandardMaterial({
+    color: '#7d786a',
+    flatShading: true,
+    roughness: 0.95,
+  })
+  // 风化石柱:三段堆叠,逐段收窄 + 错位
+  const pillar = (px) => {
+    const p = new THREE.Group()
+    let y = 0
+    for (let i = 0; i < 3; i++) {
+      const segH = 1.55 - i * 0.12
+      const box = new THREE.Mesh(
+        new THREE.BoxGeometry(1.15 - i * 0.12, segH, 1.35 - i * 0.1),
+        stoneMat,
+      )
+      box.position.set(
+        px + (noise(i, px) - 0.5) * 0.14,
+        y + segH / 2,
+        (noise(px, i) - 0.5) * 0.12,
+      )
+      box.rotation.y = (noise(i * 2.1, px) - 0.5) * 0.1
+      p.add(box)
+      y += segH * 0.99
+    }
+    return p
+  }
+  g.add(pillar(-1.75), pillar(1.75))
+  // 门楣:两块横板错落堆叠(断裂风化感)
+  const lintel = new THREE.Mesh(new THREE.BoxGeometry(4.9, 0.85, 1.5), stoneMat)
+  lintel.position.y = 4.75
+  lintel.rotation.z = 0.02
+  const lintel2 = new THREE.Mesh(new THREE.BoxGeometry(3.6, 0.6, 1.3), stoneMat)
+  lintel2.position.set(-0.3, 5.45, 0)
+  lintel2.rotation.z = -0.03
+  g.add(lintel, lintel2)
+
+  // 门内竖放发光圆环(异界通道)
+  gatePortal = new THREE.Mesh(
+    new THREE.TorusGeometry(1.4, 0.09, 10, 48),
+    new THREE.MeshStandardMaterial({
+      color: '#8a8060',
+      emissive: '#c8b890',
+      emissiveIntensity: 1.4,
+      flatShading: true,
+    }),
+  )
+  gatePortal.position.y = 2.6
+  g.add(gatePortal)
+  // 门内微光盘(通道辉光)
+  const disc = new THREE.Mesh(
+    new THREE.CircleGeometry(1.32, 32),
+    new THREE.MeshBasicMaterial({
+      color: '#c8b890',
+      transparent: true,
+      opacity: 0.16,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+    }),
+  )
+  disc.position.y = 2.6
+  g.add(disc)
+  const gateLight = new THREE.PointLight('#c8b890', 14, 11, 2)
+  gateLight.position.y = 2.6
+  g.add(gateLight)
+
+  // 高空水平悬浮巨环(永转 + 缓慢浮动)
+  gateSky = new THREE.Group()
+  gateSky.position.y = 10.5
+  const skyRingMesh = new THREE.Mesh(
+    new THREE.TorusGeometry(4.1, 0.16, 10, 64),
+    new THREE.MeshStandardMaterial({
+      color: '#8a8060',
+      emissive: '#d8c88e',
+      emissiveIntensity: 1.5,
+      flatShading: true,
+    }),
+  )
+  skyRingMesh.rotation.x = Math.PI / 2
+  gateSky.add(skyRingMesh)
+  g.add(gateSky)
+
+  g.traverse((o) => {
+    o.frustumCulled = false
+  })
+  scene.add(g)
 }
 
 function buildMarker(region, y) {
@@ -622,13 +792,17 @@ onMounted(() => {
 
   // ----- 地表层 -----
   buildTerrain()
-  seaMesh = makeSea(120, -0.3, 48)
+  seaMesh = makeSea(170, -0.3, 56) // 加大海面,覆盖环海与外缘虚空
   buildTrees()
   buildParticles()
   buildStars()
   buildRimRain()
   buildCrystalCluster(-6, -5, '#d8c89a') // 星坠荒原水晶簇
   buildCrystalCluster(-7.5, -4, '#d8c89a', 5, 1.2)
+  buildCrystalCluster(3, -8, '#a8d8e8', 5, 1.5) // 冰原冰晶簇
+  buildCrystalCluster(0.5, -6.8, '#bfe6f2', 4, 1.2)
+  buildIslet() // 古境王门离岛
+  buildKingsgate()
 
   // ----- 天空层:悬浮岛 + 光桥 + 灯塔 -----
   const isles = [
@@ -650,7 +824,8 @@ onMounted(() => {
   // ----- 板块标记 -----
   for (const r of regions) {
     let y
-    if (r.layer === 'surface') y = Math.max(heightAt(r.x, r.z) * H_SCALE, 0) + 1.4
+    if (r.id === 'kingsgate') y = Math.max(isleHeightAt(r.x, r.z) * H_SCALE, 0) + 1.4
+    else if (r.layer === 'surface') y = Math.max(heightAt(r.x, r.z) * H_SCALE, 0) + 1.4
     else if (r.layer === 'sky') y = SKY_Y + 2.2
     else y = r.id === 'crystal-vault' ? UNDER_DOME_Y - 2.5 : UNDER_SEA_Y + 1.6
     buildMarker(r, y)
@@ -752,6 +927,18 @@ onMounted(() => {
     particles.material.opacity = THREE.MathUtils.lerp(NIGHT.particleOp, DAY.particleOp, dn)
     const emK = THREE.MathUtils.lerp(NIGHT.emissiveK, DAY.emissiveK, dn)
 
+    // 地下层恒定暗夜视觉:不随网站主题昼夜变化
+    if (layer.value === 'underground') {
+      scene.background.set('#07080d')
+      scene.fog.color.set('#07080d')
+      hemi.color.set('#232230')
+      hemi.groundColor.set('#0c0a12')
+      hemi.intensity = 0.3
+      dirLight.color.set('#9a8ae8')
+      dirLight.intensity = 0.35
+      seaMesh.material.color.set('#0d2831')
+    }
+
     // 元素动画
     if (!reduced) {
       animateSea(seaMesh, t, 0.16)
@@ -779,14 +966,24 @@ onMounted(() => {
         rp.setY(i, y)
       }
       rp.needsUpdate = true
+      // 古境王门:门内圆环缓转 + 高空巨环自转/浮动
+      if (gatePortal) {
+        gatePortal.rotation.z = t * 0.25
+        gatePortal.material.emissiveIntensity = 1.3 + Math.sin(t * 1.1) * 0.35
+      }
+      if (gateSky) {
+        gateSky.rotation.y = t * 0.12
+        gateSky.position.y = 10.5 + Math.sin(t * 0.45) * 0.5
+      }
     }
 
-    // 浮标呼吸发光 + 悬停放大
+    // 浮标呼吸发光 + 悬停放大(地下层发光恒定,不随昼夜)
     for (const k of Object.keys(gemsByLayer)) {
+      const kEm = k === 'underground' ? 1.0 : emK
       for (const gem of gemsByLayer[k]) {
         const r = gem.userData.region
         gem.material.emissiveIntensity =
-          (0.65 + (reduced ? 0 : 0.35 * Math.sin(t * 2 + r.x))) * emK
+          (0.65 + (reduced ? 0 : 0.35 * Math.sin(t * 2 + r.x))) * kEm
         const target = hovered && hovered.id === r.id ? 1.35 : 1
         gem.scale.setScalar(gem.scale.x + (target - gem.scale.x) * 0.15)
       }
