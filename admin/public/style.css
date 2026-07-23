@@ -1,0 +1,214 @@
+:root {
+  --rose-light: #f4d0c7;
+  --rose-mid: #e5a6a1;
+  --rose-deep: #c67a7a;
+  --bg: #161210;
+  --surface: #1f1a18;
+  --surface-2: #2a2220;
+  --text: #f2e9e6;
+  --text-soft: #b3a19c;
+  --border: #342925;
+  --accent: var(--rose-mid);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'PingFang SC', 'Microsoft YaHei', 'Segoe UI', sans-serif;
+  min-height: 100vh;
+}
+
+header {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+header h1 { font-size: 1.1rem; margin: 0; display: flex; align-items: center; gap: .5rem; }
+.dot { width: 11px; height: 11px; border-radius: 4px; background: linear-gradient(135deg, var(--rose-light), var(--rose-deep)); display: inline-block; }
+.hint { font-size: .78rem; color: var(--text-soft); }
+
+.tabs {
+  display: flex;
+  gap: .5rem;
+  padding: .8rem 1.5rem 0;
+}
+
+.tab {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-soft);
+  padding: .45rem 1.4rem;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: .92rem;
+}
+
+.tab.active {
+  background: var(--rose-deep);
+  border-color: var(--rose-deep);
+  color: #fff;
+  font-weight: 600;
+}
+
+.panel { display: none; padding: 1.2rem 1.5rem 3rem; }
+.panel.active { display: flex; gap: 1.2rem; }
+#tab-photos.panel.active, #tab-sync.panel.active { flex-direction: column; }
+
+/* ---------- 通用控件 ---------- */
+input, select, textarea {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 8px;
+  padding: .45rem .7rem;
+  font-size: .9rem;
+  font-family: inherit;
+  width: 100%;
+}
+
+input:focus, textarea:focus, select:focus { outline: 1px solid var(--accent); }
+
+.btn {
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  border-radius: 8px;
+  padding: .5rem 1.1rem;
+  cursor: pointer;
+  font-size: .9rem;
+}
+
+.btn.primary { background: var(--rose-deep); border-color: var(--rose-deep); color: #fff; font-weight: 600; }
+.btn.danger { background: transparent; border-color: #7a3a3a; color: #e08a8a; }
+.btn.full { width: 100%; }
+.btn.big { padding: .8rem 2rem; font-size: 1rem; }
+.btn:disabled { opacity: .5; cursor: default; }
+
+.row { display: flex; gap: .5rem; align-items: center; }
+.link { color: var(--accent); cursor: pointer; text-decoration: underline; }
+.dim { color: var(--text-soft); font-size: .82rem; }
+.status { font-size: .85rem; color: var(--accent); }
+code { background: var(--surface-2); padding: .1em .4em; border-radius: 5px; font-size: .88em; }
+
+/* ---------- 日记 ---------- */
+.side { width: 240px; flex-shrink: 0; }
+
+.item-list { list-style: none; margin: .8rem 0 0; padding: 0; display: grid; gap: .5rem; }
+
+.item-list li {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: .6rem .8rem;
+  cursor: pointer;
+}
+
+.item-list li:hover { border-color: var(--accent); }
+.item-list li.active { border-color: var(--rose-deep); background: var(--surface-2); }
+.item-list .t { font-weight: 600; font-size: .9rem; }
+.item-list .d { font-size: .75rem; color: var(--text-soft); margin-top: .2rem; }
+
+.editor { flex: 1; min-width: 0; }
+.editor.empty { color: var(--text-soft); padding: 3rem; text-align: center; background: var(--surface); border: 1px dashed var(--border); border-radius: 12px; }
+
+.fields { display: grid; grid-template-columns: 1fr 1fr; gap: .7rem 1rem; margin-bottom: .8rem; }
+.fields label { font-size: .8rem; color: var(--text-soft); display: grid; gap: .3rem; }
+.fields label.wide { grid-column: 1 / -1; }
+#f-cover-pick { width: 130px; flex-shrink: 0; }
+
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
+
+#f-body {
+  height: 46vh;
+  resize: vertical;
+  font-family: 'Consolas', 'Courier New', monospace;
+  line-height: 1.7;
+}
+
+.preview {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: .8rem 1.1rem;
+  height: 46vh;
+  overflow: auto;
+  line-height: 1.8;
+  font-size: .92rem;
+}
+
+.preview h1, .preview h2, .preview h3 { line-height: 1.4; }
+.preview blockquote { border-left: 3px solid var(--rose-deep); margin: 1em 0; padding: .4em 1em; background: var(--surface-2); border-radius: 0 8px 8px 0; color: var(--text-soft); }
+.preview img { max-width: 100%; border-radius: 8px; }
+.preview code { background: var(--surface-2); }
+
+.actions { display: flex; align-items: center; gap: .8rem; margin-top: .8rem; }
+
+/* ---------- 照片 ---------- */
+.token-form {
+  background: var(--surface);
+  border: 1px solid var(--rose-deep);
+  border-radius: 12px;
+  padding: 1rem 1.2rem;
+}
+
+.token-form p { color: var(--text-soft); font-size: .85rem; }
+
+.dropzone {
+  border: 2px dashed var(--border);
+  border-radius: 14px;
+  padding: 2rem;
+  text-align: center;
+  transition: border-color .2s, background .2s;
+}
+
+.dropzone.over { border-color: var(--accent); background: var(--surface); }
+.dropzone p { margin: .3rem 0; }
+
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.photo-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.photo-card img { width: 100%; aspect-ratio: 16/10; object-fit: cover; background: var(--surface-2); }
+.photo-card .body { padding: .7rem .8rem; display: grid; gap: .45rem; }
+.photo-card label { font-size: .72rem; color: var(--text-soft); display: grid; gap: .2rem; }
+.photo-card .url { font-size: .7rem; color: var(--text-soft); word-break: break-all; }
+.photo-card .ops { display: flex; gap: .5rem; align-items: center; margin-top: .2rem; }
+.photo-card .note { font-size: .7rem; color: var(--text-soft); }
+
+/* ---------- 同步 ---------- */
+.sync-box { max-width: 760px; display: grid; gap: 1rem; }
+.sync-box p { color: var(--text-soft); }
+
+.output {
+  background: #0e0b0a;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem 1.2rem;
+  min-height: 140px;
+  white-space: pre-wrap;
+  word-break: break-all;
+  font-size: .82rem;
+  color: var(--rose-light);
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .panel.active { flex-direction: column; }
+  .side { width: 100%; }
+  .split { grid-template-columns: 1fr; }
+}

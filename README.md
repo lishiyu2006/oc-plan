@@ -17,6 +17,10 @@
 
 ```
 ├── .github/workflows/deploy.yml   # GitHub Actions 自动部署到 Pages
+├── admin/                         # 本地管理后台(npm run admin,端口 3777)
+│   ├── server.mjs                 # 零依赖 Node 服务:日记/照片/上传/同步 API
+│   ├── public/                    # 原生 HTML/JS/CSS 单页界面(暗色主题)
+│   └── config.local.json          # GitHub token(已 gitignore,首次启动自动从 PicGo 导入)
 ├── content/
 │   ├── photos.json                # 照片数据(id/title/url/date/album/description)
 │   └── diary/*.md                 # 日记,每篇一个 md,frontmatter: title/date/cover/summary
@@ -100,6 +104,22 @@ summary: 列表页显示的摘要
 3. 仓库 Settings → Pages → Source 选择 **GitHub Actions**。
 4. push 到 main 后,Actions 自动 `npm ci && npm run build` 并部署;几分钟后访问 `https://<你的用户名>.github.io/<仓库名>/`。
 5. SPA 刷新 404 问题已通过构建时生成 `404.html` 解决,无需额外配置。
+
+## 本地管理后台
+
+不想手编 markdown / photos.json、也不想在 PicGo 桌面端手动切换图床?项目内置一个零依赖的本地管理后台。
+
+```bash
+npm run admin          # 或双击 admin/启动后台.bat
+```
+
+启动后自动打开 `http://localhost:3777`(仅监听本机),包含三个标签页:
+
+- **日记**:左侧列表(解析每篇 md 的 frontmatter),右侧编辑器 —— 顶部 title / date / cover(可从照片库下拉选取)/ summary 字段,正文左侧 Markdown 输入、右侧 marked 实时预览;支持新建(自动生成 `YYYY-MM-DD-slug.md`,中文标题自动回退为时间戳 slug)、保存、删除(带确认)。
+- **照片**:拖放或选择图片 → 后端直接调用 GitHub Contents API 上传到图床仓库 `lishiyu2006/picgo` 的 `img/`(文件名冲突自动加时间戳前缀),返回 jsDelivr 链接并自动追加到 `content/photos.json`;缩略图网格中可编辑 title / date / album / description;删除仅移除 photos.json 记录,不删图床文件(页面上有注明)。
+- **同步**:一个「提交并推送」按钮,执行 `git add content/ && git commit && git push`,输出显示在页面上;无变更时提示「没有需要同步的内容」。
+
+**Token 来源与安全**:token 存放在 `admin/config.local.json`(已加入 .gitignore,不会进 git)。首次启动时程序会自动从 PicGo 的 `data.json`(`%APPDATA%\picgo\data.json` → `uploader.github.configList` 中 `lishiyu2006/picgo` 那条)导入 token;导入失败则照片页会显示表单让你手动粘贴。token 值永远不会打印到日志或回显到页面。
 
 ## content 自动同步脚本
 

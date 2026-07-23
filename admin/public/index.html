@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OC · 管理后台</title>
+  <link rel="stylesheet" href="/style.css" />
+  <script src="/vendor/marked.min.js"></script>
+</head>
+<body>
+  <header>
+    <h1><span class="dot"></span>OC · 管理后台</h1>
+    <span class="hint">localhost:3777 · 仅本机使用</span>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="diary">日记</button>
+    <button class="tab" data-tab="photos">照片</button>
+    <button class="tab" data-tab="sync">同步</button>
+  </nav>
+
+  <!-- ========== 日记 ========== -->
+  <section id="tab-diary" class="panel active">
+    <aside class="side">
+      <button id="btn-new-post" class="btn primary full">+ 新建日记</button>
+      <ul id="post-list" class="item-list"></ul>
+    </aside>
+    <main class="editor" id="editor-wrap" hidden>
+      <div class="fields">
+        <label>标题 <input id="f-title" type="text" /></label>
+        <label>日期 <input id="f-date" type="date" /></label>
+        <label class="wide">封面 URL
+          <div class="row">
+            <input id="f-cover" type="text" placeholder="图片链接,或从右侧照片库选择" />
+            <select id="f-cover-pick" title="从照片库选择封面"><option value="">照片库…</option></select>
+          </div>
+        </label>
+        <label class="wide">摘要 <input id="f-summary" type="text" /></label>
+      </div>
+      <div class="split">
+        <textarea id="f-body" placeholder="用 Markdown 记录今天…" spellcheck="false"></textarea>
+        <div id="preview" class="preview"></div>
+      </div>
+      <div class="actions">
+        <button id="btn-save" class="btn primary">保存</button>
+        <button id="btn-delete" class="btn danger">删除</button>
+        <span id="editor-status" class="status"></span>
+      </div>
+    </main>
+    <main class="editor empty" id="editor-empty">← 从左侧选择一篇日记,或点击「新建日记」</main>
+  </section>
+
+  <!-- ========== 照片 ========== -->
+  <section id="tab-photos" class="panel">
+    <div id="token-form" class="token-form" hidden>
+      <strong>未配置 GitHub token</strong>
+      <p>从 PicGo 自动导入失败。请粘贴一个有 repo 权限的 GitHub Personal Access Token,它只会保存在本机 <code>admin/config.local.json</code>(已 gitignore)。</p>
+      <div class="row">
+        <input id="token-input" type="password" placeholder="ghp_… / github_pat_…" />
+        <button id="btn-token-save" class="btn primary">保存 token</button>
+      </div>
+      <span id="token-status" class="status"></span>
+    </div>
+
+    <div id="dropzone" class="dropzone">
+      <p>把图片拖到这里,或 <label class="link">点击选择文件<input id="file-input" type="file" accept="image/*" multiple hidden /></label></p>
+      <p class="dim">将直接上传到图床仓库 lishiyu2006/picgo 的 img/ 目录,并自动登记到 photos.json</p>
+    </div>
+    <div id="upload-status" class="status"></div>
+
+    <div id="photo-grid" class="photo-grid"></div>
+  </section>
+
+  <!-- ========== 同步 ========== -->
+  <section id="tab-sync" class="panel">
+    <div class="sync-box">
+      <p>把 <code>content/</code> 的变更提交并推送到 GitHub(推送后 Actions 会自动重新部署网站)。</p>
+      <button id="btn-sync" class="btn primary big">提交并推送 content/</button>
+      <pre id="sync-output" class="output">点击按钮开始同步…</pre>
+    </div>
+  </section>
+
+  <script src="/app.js"></script>
+</body>
+</html>

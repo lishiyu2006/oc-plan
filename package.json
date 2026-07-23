@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build && node scripts/copy-404.mjs",
     "preview": "vite preview",
-    "sync": "node scripts/sync.mjs"
+    "sync": "node scripts/sync.mjs",
+    "admin": "node admin/server.mjs"
   },
   "dependencies": {
     "marked": "^15.0.7",

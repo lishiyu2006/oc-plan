@@ -2,6 +2,7 @@ node_modules
 dist
 dist-ssr
 *.local
+admin/config.local.json
 .DS_Store
 Thumbs.db
 .vscode/*
