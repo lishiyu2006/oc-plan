@@ -1,7 +1,7 @@
 ---
 title: 窗边的绿
-date: 2025-04-13
-cover: https://picsum.photos/id/106/1600/900
+date: 2025-04-14
+cover: "https://picsum.photos/id/106/1600/900"
 summary: 宅在家的一天,给窗边的植物们拍了组写真。
 ---
 
