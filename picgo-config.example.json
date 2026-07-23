@@ -4,11 +4,11 @@
     "current": "githubPlus",
     "uploader": "githubPlus",
     "githubPlus": {
-      "repo": "<你的用户名>/<图片仓库名>",
+      "repo": "lishiyu2006/picgo",
       "branch": "main",
       "token": "<GitHub Personal Access Token,需 repo 权限>",
       "path": "img/",
-      "customUrl": "https://cdn.jsdelivr.net/gh/<你的用户名>/<图片仓库名>@main",
+      "customUrl": "https://cdn.jsdelivr.net/gh/lishiyu2006/picgo@main",
       "origin": "github"
     }
   },

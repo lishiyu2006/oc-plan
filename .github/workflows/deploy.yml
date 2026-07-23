@@ -29,11 +29,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # TODO: 把 /your-repo/ 替换为你的仓库名,例如 /oc-photo-diary/
       - name: Build
         run: npm run build
         env:
-          VITE_BASE_PATH: /your-repo/
+          VITE_BASE_PATH: /oc-plan/
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
