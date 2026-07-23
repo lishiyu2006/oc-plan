@@ -23,7 +23,11 @@ const c = computed(() => getCharacter(route.params.id))
         <p class="title anim" style="--d: 0.45s">{{ c.title }}</p>
         <div class="rule anim" style="--d: 0.55s"></div>
         <p class="intro anim" style="--d: 0.7s">{{ c.intro }}</p>
-        <div class="ops anim" style="--d: 0.85s">
+        <template v-if="c.appearance">
+          <p class="app-label anim" style="--d: 0.82s">长相 · APPEARANCE</p>
+          <p class="appearance anim" style="--d: 0.9s">{{ c.appearance }}</p>
+        </template>
+        <div class="ops anim" style="--d: 1.05s">
           <router-link class="back" to="/characters">← 返回人物</router-link>
           <router-link class="back accent" :to="`/records/${c.id}`">查看插画 →</router-link>
         </div>
@@ -123,6 +127,21 @@ const c = computed(() => getCharacter(route.params.id))
   line-height: 2.1;
   font-size: 0.95rem;
   color: var(--text-soft);
+  max-width: 46ch;
+}
+
+.app-label {
+  margin: 1.8rem 0 0.5rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.32em;
+  color: var(--accent);
+}
+
+.appearance {
+  margin: 0;
+  line-height: 2.1;
+  font-size: 0.95rem;
+  color: var(--text);
   max-width: 46ch;
 }
 

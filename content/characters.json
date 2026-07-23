@@ -6,6 +6,8 @@
     "title": "边境巡守 · 极光谷出身",
     "photo": "https://picsum.photos/seed/oc-ling/900/1200",
     "intro": "极光谷巡守队最年轻的成员,能听见晶簇的『低鸣』并借此预判回声风暴。沉默寡言,但会在巡逻日志里写下大段大段的诗。占位照片来自 picsum.photos,替换方式:把照片上传到图床后修改 content/characters.json 中对应人物的 photo 字段。",
+    "appearance": "极北寒地养出的少年,皮肤苍白,鼻尖总带着一点冻红。浅蓝灰的眼眸里像沉着极光的碎色,银灰短发被耳罩压出浅浅的痕。巡逻时睫毛上会挂霜,他也不擦,说是『谷给的勋章』。",
+    "appearancePrompt": "detailed character portrait of a 16-18 year old boy, border patrol warden from a far-northern aurora valley, pale skin with a frost-reddened nose tip, light blue-grey eyes reflecting faint aurora greens and violets, frost clinging to his eyelashes, short silver-grey hair with earmuff pressure marks, dark navy patrol cloak decorated with tiny crystal ornaments, quiet resilient expression, cold northern light, concept art, painterly, muted colors, atmospheric",
     "illustrations": [
       "https://picsum.photos/seed/oc-ling-1/1200/800",
       "https://picsum.photos/seed/oc-ling-2/1200/800",
@@ -19,6 +21,8 @@
     "title": "拾荒者医师 · 余烬荒原",
     "photo": "https://picsum.photos/seed/oc-qiu/900/1200",
     "intro": "在余烬荒原的部族之间行医的拾荒者,随身药箱是用旧纪元的仪器箱改装的。相信『废墟里埋着的不只是技术,还有没说出口的道歉』。占位照片来自 picsum.photos,请替换为图床链接。",
+    "appearance": "荒原日晒出的暖棕肤色,眉骨上落着淡淡的灰烬晒斑。琥珀色的眼睛总是半眯着,深棕辫子串着几枚铜环,围巾常年半遮住脸。指节上有旧烫痕——她说那是药箱和她握手的方式。",
+    "appearancePrompt": "detailed character portrait of a female scavenger medic in her early thirties from an ashen wasteland, warm sun-browned skin with ash-grey sunspots across the brow bone, amber eyes half-squinting, dark brown braids strung with small copper rings, a scarf covering the lower half of her face, a modified old-era instrument case slung across her body as a medicine box, old burn marks on her knuckles, dusty wasteland light, concept art, painterly, muted colors, atmospheric",
     "illustrations": [
       "https://picsum.photos/seed/oc-qiu-1/1200/800",
       "https://picsum.photos/seed/oc-qiu-2/1200/800",
@@ -32,6 +36,8 @@
     "title": "引路人 · 迷雾泽",
     "photo": "https://picsum.photos/seed/oc-moth/900/1200",
     "intro": "迷雾泽的引路人,与一群灯蛾相依为命。没有人知道她的真名——『蛾』是泽外的人给她起的称呼。她从不主动开口,却总能把迷路的人带到他们『真正想去的地方』。占位照片来自 picsum.photos,请替换为图床链接。",
+    "appearance": "沼泽幽光里养大的少女,皮肤苍白得近乎透明,沾着极淡的荧光粉尘。银白长发几乎垂到地面,一双深色眼睛大得不像常人,夜里会泛起蛾目般的微光。肩头总停着一只发光的灯蛾,像一盏为她引路的小灯。",
+    "appearancePrompt": "detailed character portrait of a pale teenage girl, guide of a mist-shrouded swamp, almost translucent pale skin dusted with faint luminescent powder, extremely long silver-white hair nearly touching the ground, oversized dark eyes with a subtle moth-like reflective sheen, grey-green gauze cloak, a small glowing lantern-moth resting on her shoulder, eerie yet gentle, swamp glimmer background, concept art, painterly, muted colors, atmospheric",
     "illustrations": [
       "https://picsum.photos/seed/oc-moth-1/1200/800",
       "https://picsum.photos/seed/oc-moth-2/1200/800",
@@ -45,6 +51,8 @@
     "title": "观星台守望者 · 王冠峰",
     "photo": "https://picsum.photos/seed/oc-yan/900/1200",
     "intro": "独自守着王冠峰观星台遗址的记录者,用旧王朝的星图对照今夜的天空,寻找『空岛』移动的轨迹。所有故事线的碎片,最终都会汇到她的笔记里。占位照片来自 picsum.photos,请替换为图床链接。",
+    "appearance": "高原日晒的小麦色皮肤,两团明显的高原红晕挂在脸蛋上,鼻尖也泛着红。深色眼睛亮得惊人,圆铜护目镜推在额上,手指沾着星图的墨渍。厚重的层叠长袍裹着她,背上永远背着那只黄铜星盘。",
+    "appearancePrompt": "detailed character portrait of a female plateau watcher in her twenties, sun-tanned wheat-colored skin with two distinct highland-red blush patches on her cheeks and a reddened nose tip, bright dark eyes, round copper goggles pushed up on her forehead, star-chart ink stains on her fingers, thick layered Tibetan-style robes, a brass astrolabe strapped to her back, high-altitude clear light, wind-battered observatory ruins background, concept art, painterly, muted colors, atmospheric",
     "illustrations": [
       "https://picsum.photos/seed/oc-yan-1/1200/800",
       "https://picsum.photos/seed/oc-yan-2/1200/800",

@@ -138,9 +138,11 @@ const reduced =
   window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 let renderer, scene, camera, controls, clock, rafId = 0
+let sceneTop, sceneUnder // 地-天 / 地下两个独立 scene,每帧只渲染当前层
 let hemi, dirLight, seaMesh, underSeaMesh, stars, particles, rimRain
 let gatePortal = null // 王门门内发光圆环
 let gateSky = null // 王门高空悬浮巨环(含浮动)
+let wallClouds = [] // 断境长城崖外云海
 let islands = []
 let markerGroups = {} // layer -> Group(含浮标 + point light)
 let gemsByLayer = { sky: [], surface: [], underground: [] }
@@ -208,16 +210,58 @@ function stepTween(now) {
   }
 }
 
-/* ---------- 交互 ---------- */
-function switchLayer(key) {
-  if (key === layer.value) return
+/* ---------- 交互:层切换 + 笔画擦除过渡 ---------- */
+const wipeEl = ref(null)
+const wipeBd = ref(null)
+let wiping = false
+
+function applyLayer(key) {
   layer.value = key
   selected.value = null
   focused = false
-  for (const k of Object.keys(markerGroups)) markerGroups[k].visible = k === key
   const v = LAYER_VIEW[key]
   // 两段式:先飞到高空中继点,再下降进入目标层,避免穿过地表/地下背板
   flyTo(SAFE_RELAY.pos, SAFE_RELAY.tgt, 0.7, () => flyTo(v.pos, v.tgt, 0.85))
+}
+
+function switchLayer(key) {
+  if (key === layer.value || wiping) return
+  if (reduced) {
+    applyLayer(key) // reduced-motion:跳过擦除动画直接切换
+    return
+  }
+  wiping = true
+  const el = wipeEl.value
+  const bd = wipeBd.value
+  const W = window.innerWidth
+  const DUR = 1050
+  const t0 = performance.now()
+  let switched = false
+  const step = (now) => {
+    const t = Math.min(1, (now - t0) / DUR)
+    // 位置曲线:x = 0.5√(2t)(前半)/ 1-0.5√(2(1-t))(后半) → 两端最快,t=0.5 最慢
+    const x = t < 0.5 ? 0.5 * Math.sqrt(2 * t) : 1 - 0.5 * Math.sqrt(2 * (1 - t))
+    // 速度 v = 0.5/√(2u),u 为到最近端点的距离;归一化后用于宽度
+    const u = Math.max(Math.min(t, 1 - t), 0.04)
+    const v = 0.5 / Math.sqrt(2 * u)
+    const speedRatio = Math.min(1, (v - 0.5) / 1.27)
+    const w = (0.55 - 0.4 * speedRatio) * W // 宽度与速度成反比:0.15W(快)~0.55W(慢)
+    el.style.width = w + 'px'
+    el.style.transform = `translateX(${x * (W + w) - w}px) skewX(-3deg)`
+    bd.style.opacity = String(0.92 * (1 - Math.abs(t - 0.5) * 2)) // 背景压暗,t=0.5 最强
+    if (!switched && t >= 0.5) {
+      switched = true
+      applyLayer(key) // 全遮瞬间切换 active scene
+    }
+    if (t < 1) requestAnimationFrame(step)
+    else {
+      el.style.transform = 'translateX(-110vw) skewX(-3deg)'
+      el.style.width = '55vw'
+      bd.style.opacity = '0'
+      wiping = false
+    }
+  }
+  requestAnimationFrame(step)
 }
 
 function focusRegion(region) {
@@ -727,6 +771,124 @@ function buildKingsgate() {
   scene.add(g)
 }
 
+/* ---------- 断境长城:高原崖边的古城墙遗迹 + 断裂塔楼 + 云海 ---------- */
+function archWallGeo(w, h, arches = 1) {
+  // 矩形墙板 + 底部拱形门洞(Shape 挖洞后 Extrude)
+  const s = new THREE.Shape()
+  s.moveTo(-w / 2, 0)
+  s.lineTo(w / 2, 0)
+  s.lineTo(w / 2, h)
+  s.lineTo(-w / 2, h)
+  s.closePath()
+  const r = 0.4
+  const ay = 1.05
+  const offsets = arches === 2 ? [-0.55, 0.55] : [0]
+  for (const ox of offsets) {
+    const hole = new THREE.Path()
+    hole.moveTo(ox - r, 0)
+    hole.lineTo(ox - r, ay)
+    hole.absarc(ox, ay, r, Math.PI, 0, true)
+    hole.lineTo(ox + r, 0)
+    hole.closePath()
+    s.holes.push(hole)
+  }
+  const geo = new THREE.ExtrudeGeometry(s, { depth: 0.8, bevelEnabled: false })
+  geo.translate(0, 0, -0.4)
+  return geo
+}
+
+function buildSunderwall() {
+  const region = regions.find((r) => r.id === 'sunderwall')
+  if (!region) return
+  const WX = region.x
+  const WZ = region.z
+  const g = new THREE.Group()
+  g.position.set(WX, 0, WZ)
+  g.rotation.y = Math.atan2(WX, WZ) // 局部 +z 朝崖外(海的方向),墙沿局部 x 绵延
+  const cosY = Math.cos(g.rotation.y)
+  const sinY = Math.sin(g.rotation.y)
+  const groundAt = (lx, lz) => heightAt(WX + lx * cosY + lz * sinY, WZ - lx * sinY + lz * cosY)
+  const stoneCol = new THREE.Color('#8fa8a0')
+  const stoneMat = (dk) =>
+    new THREE.MeshStandardMaterial({
+      color: stoneCol.clone().offsetHSL(0, 0, dk),
+      flatShading: true,
+      roughness: 0.95,
+    })
+  const grassMat = new THREE.MeshStandardMaterial({ color: '#5c6b52', flatShading: true, roughness: 1 })
+
+  // 4 段墙板:高低错落 + 错位微旋转(风化),其中一段开双拱门
+  const segs = [
+    { lx: -3.3, w: 2.2, h: 2.5, arches: 1 },
+    { lx: -1.1, w: 2.2, h: 2.1, arches: 1 },
+    { lx: 1.1, w: 2.2, h: 2.8, arches: 2 },
+    { lx: 3.3, w: 2.2, h: 2.3, arches: 1 },
+  ]
+  segs.forEach((sg, i) => {
+    const wall = new THREE.Mesh(archWallGeo(sg.w, sg.h, sg.arches), stoneMat((noise(i, 4) - 0.5) * 0.1))
+    wall.position.set(sg.lx + (noise(i, 1) - 0.5) * 0.12, groundAt(sg.lx, 0) * H_SCALE - 0.15, (noise(i, 2) - 0.5) * 0.2)
+    wall.rotation.set(0, (noise(i, 3) - 0.5) * 0.08, (noise(i, 5) - 0.5) * 0.05)
+    g.add(wall)
+    // 顶部长草:几撮小锥
+    const gn = 2 + (i % 2)
+    for (let j = 0; j < gn; j++) {
+      const tuft = new THREE.Mesh(new THREE.ConeGeometry(0.09, 0.3, 5), grassMat)
+      tuft.position.set(
+        sg.lx + (noise(i * 7, j) - 0.5) * sg.w * 0.8,
+        wall.position.y + sg.h + 0.1,
+        (noise(j, i * 3) - 0.5) * 0.6,
+      )
+      tuft.rotation.z = (noise(i, j * 9) - 0.5) * 0.3
+      g.add(tuft)
+    }
+  })
+
+  // 两端断裂塔楼:左塔高(顶块歪斜),右塔矮(彻底塌断,旁边倒着残块)
+  const tower = (lx, baseH) => {
+    const t = new THREE.Group()
+    const gy = groundAt(lx, 0) * H_SCALE - 0.2
+    const base = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 1.0, baseH, 7), stoneMat(-0.05))
+    base.position.y = baseH / 2
+    const top = new THREE.Mesh(new THREE.CylinderGeometry(0.65, 0.78, 1.1, 7), stoneMat(0.02))
+    top.position.set(0.08, baseH + 0.45, 0)
+    top.rotation.set(0.06, 0.3, 0.16) // 断裂后歪斜的顶层
+    t.add(base, top)
+    t.position.set(lx, gy, 0)
+    return t
+  }
+  g.add(tower(-5.2, 2.7), tower(5.4, 1.6))
+  const fallen = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.7, 0.9), stoneMat(-0.02))
+  fallen.position.set(6.4, groundAt(6.4, 0.8) * H_SCALE + 0.15, 0.8)
+  fallen.rotation.set(0.2, 0.5, 0.28)
+  g.add(fallen)
+
+  // 崖外云海:几片半透明白色扁球,缓慢漂移
+  wallClouds = []
+  const cloudMat = new THREE.MeshStandardMaterial({
+    color: '#dfe8ea',
+    transparent: true,
+    opacity: 0.32,
+    roughness: 1,
+    depthWrite: false,
+  })
+  const baseY = heightAt(WX, WZ) * H_SCALE
+  for (let i = 0; i < 5; i++) {
+    const cl = new THREE.Mesh(new THREE.SphereGeometry(1.3 + noise(i, 7) * 1.1, 8, 6), cloudMat)
+    const lx = -4.5 + i * 2.2 + (noise(i, 3) - 0.5) * 1.6
+    cl.position.set(lx, baseY - 0.8 - noise(i, 9) * 1.4, 3.4 + noise(i, 5) * 2.8)
+    cl.scale.set(2.0, 0.42, 1.15)
+    cl.userData.baseX = lx
+    cl.userData.phase = i * 1.3
+    wallClouds.push(cl)
+    g.add(cl)
+  }
+
+  g.traverse((o) => {
+    o.frustumCulled = false
+  })
+  scene.add(g)
+}
+
 function buildMarker(region, y) {
   const g = new THREE.Group()
   g.position.set(region.x, y, region.z)
@@ -764,9 +926,14 @@ function buildMarker(region, y) {
 
 onMounted(() => {
   const el = host.value
-  scene = new THREE.Scene()
-  scene.background = new THREE.Color(DAY.bg)
-  scene.fog = new THREE.Fog(DAY.bg.getHex(), 36, 95)
+  // 地-天 / 地下两个独立 scene:每帧只渲染当前层
+  sceneTop = new THREE.Scene()
+  sceneTop.background = new THREE.Color(DAY.bg)
+  sceneTop.fog = new THREE.Fog(DAY.bg.getHex(), 36, 95)
+  sceneUnder = new THREE.Scene()
+  sceneUnder.background = new THREE.Color('#07080d')
+  sceneUnder.fog = new THREE.Fog('#07080d', 30, 90)
+  scene = sceneTop // 构建期别名:build* 函数统一往 scene 里放
 
   camera = new THREE.PerspectiveCamera(46, el.clientWidth / el.clientHeight, 0.1, 250)
   camera.position.set(...LAYER_VIEW.surface.pos)
@@ -776,21 +943,28 @@ onMounted(() => {
   renderer.setSize(el.clientWidth, el.clientHeight)
   el.appendChild(renderer.domElement)
 
-  // 光照:hemisphere + directional 主光
+  // 地-天 scene 光照:hemisphere + directional 主光(随昼夜 lerp)
   hemi = new THREE.HemisphereLight(DAY.hemiSky, DAY.hemiGround, DAY.hemiInt)
-  scene.add(hemi)
+  sceneTop.add(hemi)
   dirLight = new THREE.DirectionalLight(DAY.dirColor, DAY.dirInt)
   dirLight.position.set(14, 24, 10)
-  scene.add(dirLight)
+  sceneTop.add(dirLight)
+  // 地下 scene 独立恒定光照(不受网站主题昼夜影响)
+  const underHemi = new THREE.HemisphereLight('#232230', '#0c0a12', 0.3)
+  sceneUnder.add(underHemi)
+  const underDir = new THREE.DirectionalLight('#9a8ae8', 0.35)
+  underDir.position.set(10, 6, 14)
+  sceneUnder.add(underDir)
 
-  // 三层 Group(板块浮标 + 点光按层显隐)
-  for (const k of ['sky', 'surface', 'underground']) {
-    markerGroups[k] = new THREE.Group()
-    markerGroups[k].visible = k === 'surface'
-    scene.add(markerGroups[k])
-  }
+  // 浮标组:天空/地表归 sceneTop,地下归 sceneUnder(随 scene 天然显隐)
+  markerGroups.sky = new THREE.Group()
+  markerGroups.surface = new THREE.Group()
+  markerGroups.underground = new THREE.Group()
+  sceneTop.add(markerGroups.sky, markerGroups.surface)
+  sceneUnder.add(markerGroups.underground)
 
-  // ----- 地表层 -----
+  // ----- 地表层(sceneTop) -----
+  scene = sceneTop
   buildTerrain()
   seaMesh = makeSea(170, -0.3, 56) // 加大海面,覆盖环海与外缘虚空
   buildTrees()
@@ -803,8 +977,9 @@ onMounted(() => {
   buildCrystalCluster(0.5, -6.8, '#bfe6f2', 4, 1.2)
   buildIslet() // 古境王门离岛
   buildKingsgate()
+  buildSunderwall() // 断境长城
 
-  // ----- 天空层:悬浮岛 + 光桥 + 灯塔 -----
+  // ----- 天空层(sceneTop):悬浮岛 + 光桥 + 灯塔 -----
   const isles = [
     [-7, -3, SKY_Y],
     [-5, -1, SKY_Y + 1],
@@ -815,11 +990,13 @@ onMounted(() => {
   buildBridge(isles[1], isles[2])
   buildIsland(5, 3, SKY_Y + 1.5, true) // 天穹灯塔
 
-  // ----- 地下层:倒悬晶穹 + 暗海 -----
+  // ----- 地下层(sceneUnder):倒悬晶穹 + 暗海 -----
+  scene = sceneUnder
   buildUnderground()
   underSeaMesh = makeSea(70, UNDER_SEA_Y, 40)
   underSeaMesh.material.emissive = new THREE.Color('#0e3a4d')
   underSeaMesh.material.emissiveIntensity = 0.5
+  scene = sceneTop
 
   // ----- 板块标记 -----
   for (const r of regions) {
@@ -912,10 +1089,10 @@ onMounted(() => {
       camera.position.copy(controls.target).add(new THREE.Vector3().setFromSpherical(s))
     }
 
-    // 昼夜 1s 左右 lerp,不硬切
+    // 昼夜 1s 左右 lerp,不硬切(只作用于地-天 scene;地下 scene 背景/光照恒定)
     dn += (dnTarget - dn) * Math.min(1, dt * 1.6)
-    scene.background.copy(tmpColor.lerpColors(NIGHT.bg, DAY.bg, dn))
-    scene.fog.color.copy(scene.background)
+    sceneTop.background.copy(tmpColor.lerpColors(NIGHT.bg, DAY.bg, dn))
+    sceneTop.fog.color.copy(sceneTop.background)
     hemi.color.lerpColors(NIGHT.hemiSky, DAY.hemiSky, dn)
     hemi.groundColor.lerpColors(NIGHT.hemiGround, DAY.hemiGround, dn)
     hemi.intensity = THREE.MathUtils.lerp(NIGHT.hemiInt, DAY.hemiInt, dn)
@@ -927,53 +1104,50 @@ onMounted(() => {
     particles.material.opacity = THREE.MathUtils.lerp(NIGHT.particleOp, DAY.particleOp, dn)
     const emK = THREE.MathUtils.lerp(NIGHT.emissiveK, DAY.emissiveK, dn)
 
-    // 地下层恒定暗夜视觉:不随网站主题昼夜变化
-    if (layer.value === 'underground') {
-      scene.background.set('#07080d')
-      scene.fog.color.set('#07080d')
-      hemi.color.set('#232230')
-      hemi.groundColor.set('#0c0a12')
-      hemi.intensity = 0.3
-      dirLight.color.set('#9a8ae8')
-      dirLight.intensity = 0.35
-      seaMesh.material.color.set('#0d2831')
-    }
+    const inUnder = layer.value === 'underground'
 
-    // 元素动画
+    // 元素动画(只更新当前层所属的 scene)
     if (!reduced) {
-      animateSea(seaMesh, t, 0.16)
-      animateSea(underSeaMesh, t * 0.7, 0.22)
+      if (inUnder) {
+        animateSea(underSeaMesh, t * 0.7, 0.22)
+      } else {
+        animateSea(seaMesh, t, 0.16)
+        for (let i = 0; i < islands.length; i++) {
+          islands[i].node.position.y = islands[i].baseY + Math.sin(t * 0.5 + i * 1.3) * 0.35
+          islands[i].node.rotation.y += dt * 0.04
+        }
+        const pp = particles.geometry.attributes.position
+        for (let i = 0; i < pp.count; i++) {
+          let y = pp.getY(i) + dt * 0.35
+          if (y > 8) y = 0.4
+          pp.setY(i, y)
+        }
+        pp.needsUpdate = true
+        const rp = rimRain.geometry.attributes.position
+        for (let i = 0; i < rp.count; i++) {
+          let y = rp.getY(i) - dt * (1.2 + (i % 5) * 0.3)
+          if (y < -14) y = 8
+          rp.setY(i, y)
+        }
+        rp.needsUpdate = true
+        // 古境王门:门内圆环缓转 + 高空巨环自转/浮动
+        if (gatePortal) {
+          gatePortal.rotation.z = t * 0.25
+          gatePortal.material.emissiveIntensity = 1.3 + Math.sin(t * 1.1) * 0.35
+        }
+        if (gateSky) {
+          gateSky.rotation.y = t * 0.12
+          gateSky.position.y = 10.5 + Math.sin(t * 0.45) * 0.5
+        }
+        // 断境长城:崖外云海缓慢漂移
+        for (const cl of wallClouds) {
+          cl.position.x = cl.userData.baseX + Math.sin(t * 0.15 + cl.userData.phase) * 0.6
+        }
+      }
       for (const r of regions) {
         if (!r._node) continue
         r._node.position.y = r._baseY + Math.sin(t * 1.2 + r.x) * 0.18
         r._gem.rotation.y = t * 0.5
-      }
-      for (let i = 0; i < islands.length; i++) {
-        islands[i].node.position.y = islands[i].baseY + Math.sin(t * 0.5 + i * 1.3) * 0.35
-        islands[i].node.rotation.y += dt * 0.04
-      }
-      const pp = particles.geometry.attributes.position
-      for (let i = 0; i < pp.count; i++) {
-        let y = pp.getY(i) + dt * 0.35
-        if (y > 8) y = 0.4
-        pp.setY(i, y)
-      }
-      pp.needsUpdate = true
-      const rp = rimRain.geometry.attributes.position
-      for (let i = 0; i < rp.count; i++) {
-        let y = rp.getY(i) - dt * (1.2 + (i % 5) * 0.3)
-        if (y < -14) y = 8
-        rp.setY(i, y)
-      }
-      rp.needsUpdate = true
-      // 古境王门:门内圆环缓转 + 高空巨环自转/浮动
-      if (gatePortal) {
-        gatePortal.rotation.z = t * 0.25
-        gatePortal.material.emissiveIntensity = 1.3 + Math.sin(t * 1.1) * 0.35
-      }
-      if (gateSky) {
-        gateSky.rotation.y = t * 0.12
-        gateSky.position.y = 10.5 + Math.sin(t * 0.45) * 0.5
       }
     }
 
@@ -990,7 +1164,7 @@ onMounted(() => {
     }
 
     controls.update()
-    renderer.render(scene, camera)
+    renderer.render(inUnder ? sceneUnder : sceneTop, camera)
   }
   animate()
 })
@@ -1000,13 +1174,15 @@ onBeforeUnmount(() => {
   for (const [target, type, fn] of listeners) target.removeEventListener(type, fn)
   listeners = []
   controls?.dispose()
-  scene?.traverse((obj) => {
-    obj.geometry?.dispose?.()
-    if (obj.material) {
-      const mats = Array.isArray(obj.material) ? obj.material : [obj.material]
-      mats.forEach((mm) => mm.dispose?.())
-    }
-  })
+  for (const s of [sceneTop, sceneUnder]) {
+    s?.traverse((obj) => {
+      obj.geometry?.dispose?.()
+      if (obj.material) {
+        const mats = Array.isArray(obj.material) ? obj.material : [obj.material]
+        mats.forEach((mm) => mm.dispose?.())
+      }
+    })
+  }
   renderer?.dispose()
   renderer?.domElement?.parentElement?.removeChild(renderer.domElement)
 })
@@ -1034,6 +1210,10 @@ onBeforeUnmount(() => {
         <span class="zh">{{ l.zh }}</span>
       </button>
     </div>
+
+    <!-- 层切换笔画擦除 overlay(盖住一切,pointer-events 不拦截) -->
+    <div ref="wipeBd" class="wipe-bd"></div>
+    <div ref="wipeEl" class="wipe"></div>
 
     <!-- 板块介绍面板:右侧滑出,左边缘渐变衔接场景 -->
     <transition name="panel">
@@ -1186,6 +1366,33 @@ onBeforeUnmount(() => {
 .panel-enter-active { transition: transform 0.4s var(--ease-out), opacity 0.35s ease-out; }
 .panel-leave-active { transition: transform 0.25s ease-out, opacity 0.2s ease-out; }
 .panel-enter-from, .panel-leave-to { transform: translateX(60px); opacity: 0; }
+
+/* ---------- 层切换笔画擦除 ---------- */
+.wipe-bd {
+  position: absolute;
+  inset: 0;
+  z-index: 38;
+  background: #0e0f11;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.wipe {
+  position: absolute;
+  top: -4%;
+  bottom: -4%;
+  left: 0;
+  width: 55vw;
+  z-index: 39;
+  background: #0e0f11;
+  border-right: 3px solid #9ed9dd; /* 前进方向亮边 */
+  box-shadow:
+    0 0 30px 8px rgba(158, 217, 221, 0.28),
+    46px 0 90px 42px #0e0f11,
+    -34px 0 70px 34px #0e0f11; /* 上下/尾部边缘不规则模糊 */
+  transform: translateX(-110vw) skewX(-3deg);
+  pointer-events: none;
+}
 
 /* ---------- 移动端 ---------- */
 @media (max-width: 860px) {
