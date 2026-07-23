@@ -1,0 +1,54 @@
+[
+  {
+    "id": "char-ling",
+    "name": "凌",
+    "nameEn": "LING",
+    "title": "边境巡守 · 极光谷出身",
+    "photo": "https://picsum.photos/seed/oc-ling/900/1200",
+    "intro": "极光谷巡守队最年轻的成员,能听见晶簇的『低鸣』并借此预判回声风暴。沉默寡言,但会在巡逻日志里写下大段大段的诗。占位照片来自 picsum.photos,替换方式:把照片上传到图床后修改 content/characters.json 中对应人物的 photo 字段。",
+    "illustrations": [
+      "https://picsum.photos/seed/oc-ling-1/1200/800",
+      "https://picsum.photos/seed/oc-ling-2/1200/800",
+      "https://picsum.photos/seed/oc-ling-3/1200/800"
+    ]
+  },
+  {
+    "id": "char-qiu",
+    "name": "裘",
+    "nameEn": "QIU",
+    "title": "拾荒者医师 · 余烬荒原",
+    "photo": "https://picsum.photos/seed/oc-qiu/900/1200",
+    "intro": "在余烬荒原的部族之间行医的拾荒者,随身药箱是用旧纪元的仪器箱改装的。相信『废墟里埋着的不只是技术,还有没说出口的道歉』。占位照片来自 picsum.photos,请替换为图床链接。",
+    "illustrations": [
+      "https://picsum.photos/seed/oc-qiu-1/1200/800",
+      "https://picsum.photos/seed/oc-qiu-2/1200/800",
+      "https://picsum.photos/seed/oc-qiu-3/1200/800"
+    ]
+  },
+  {
+    "id": "char-moth",
+    "name": "蛾",
+    "nameEn": "MOTH",
+    "title": "引路人 · 迷雾泽",
+    "photo": "https://picsum.photos/seed/oc-moth/900/1200",
+    "intro": "迷雾泽的引路人,与一群灯蛾相依为命。没有人知道她的真名——『蛾』是泽外的人给她起的称呼。她从不主动开口,却总能把迷路的人带到他们『真正想去的地方』。占位照片来自 picsum.photos,请替换为图床链接。",
+    "illustrations": [
+      "https://picsum.photos/seed/oc-moth-1/1200/800",
+      "https://picsum.photos/seed/oc-moth-2/1200/800",
+      "https://picsum.photos/seed/oc-moth-3/1200/800"
+    ]
+  },
+  {
+    "id": "char-yan",
+    "name": "砚",
+    "nameEn": "YAN",
+    "title": "观星台守望者 · 王冠峰",
+    "photo": "https://picsum.photos/seed/oc-yan/900/1200",
+    "intro": "独自守着王冠峰观星台遗址的记录者,用旧王朝的星图对照今夜的天空,寻找『空岛』移动的轨迹。所有故事线的碎片,最终都会汇到她的笔记里。占位照片来自 picsum.photos,请替换为图床链接。",
+    "illustrations": [
+      "https://picsum.photos/seed/oc-yan-1/1200/800",
+      "https://picsum.photos/seed/oc-yan-2/1200/800",
+      "https://picsum.photos/seed/oc-yan-3/1200/800"
+    ]
+  }
+]

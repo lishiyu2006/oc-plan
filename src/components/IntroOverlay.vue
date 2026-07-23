@@ -101,7 +101,7 @@ onBeforeUnmount(cleanup)
     <div class="block b4"></div>
 
     <div class="loader">
-      <p class="brand">OC · 照片日记</p>
+      <p class="brand">OC PLAN</p>
       <div class="track">
         <div class="fill" :style="{ width: progress + '%' }"></div>
       </div>
@@ -116,7 +116,7 @@ onBeforeUnmount(cleanup)
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: #131316;
+  background: #0e0f11;
   cursor: pointer;
   overflow: hidden;
 }
@@ -128,10 +128,10 @@ onBeforeUnmount(cleanup)
   animation: slide-in 0.5s cubic-bezier(0.75, 0, 0.2, 1) forwards;
 }
 
-.b1 { background: #f4d0c7; animation-delay: 0s; }
-.b2 { background: #e5a6a1; animation-delay: 0.08s; }
-.b3 { background: #c67a7a; animation-delay: 0.16s; }
-.b4 { background: #131316; animation-delay: 0.24s; }
+.b1 { background: #2a2e34; animation-delay: 0s; }
+.b2 { background: #1d2025; animation-delay: 0.08s; }
+.b3 { background: #9ed9dd; animation-delay: 0.16s; }
+.b4 { background: #0e0f11; animation-delay: 0.24s; }
 
 @keyframes slide-in {
   to { transform: translateY(0); }
@@ -173,7 +173,7 @@ onBeforeUnmount(cleanup)
   margin: 0 0 1.4rem;
   font-size: 0.9rem;
   letter-spacing: 0.3em;
-  color: #f2f0f4;
+  color: #e8eaec;
 }
 
 .track {
@@ -186,7 +186,7 @@ onBeforeUnmount(cleanup)
 .fill {
   height: 100%;
   border-radius: 3px;
-  background: linear-gradient(90deg, #f4d0c7, #e5a6a1, #c67a7a);
+  background: linear-gradient(90deg, #5fb8bd, #9ed9dd);
   transition: width 0.25s ease-out;
 }
 
@@ -194,14 +194,14 @@ onBeforeUnmount(cleanup)
   margin: 0.8rem 0 0;
   font-size: 0.78rem;
   letter-spacing: 0.2em;
-  color: #e5a6a1;
+  color: #9ed9dd;
 }
 
 .skip {
   margin: 2.4rem 0 0;
   font-size: 0.72rem;
   letter-spacing: 0.35em;
-  color: #f4d0c7;
+  color: #9a9ea4;
   opacity: 0.55;
 }
 </style>

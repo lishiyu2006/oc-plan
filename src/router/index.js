@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 // 所有页面路由均懒加载:未点击的页面不会被加载
+// three.js 只被 /world 引用,仅在该路由 chunk 中
 const routes = [
   {
     path: '/',
@@ -8,24 +9,29 @@ const routes = [
     component: () => import('../views/Home.vue'),
   },
   {
-    path: '/photos',
-    name: 'photos',
-    component: () => import('../views/Photos.vue'),
+    path: '/world',
+    name: 'world',
+    component: () => import('../views/World.vue'),
   },
   {
-    path: '/diary',
-    name: 'diary',
-    component: () => import('../views/Diary.vue'),
+    path: '/characters',
+    name: 'characters',
+    component: () => import('../views/Characters.vue'),
   },
   {
-    path: '/diary/:id',
-    name: 'diary-detail',
-    component: () => import('../views/DiaryDetail.vue'),
+    path: '/characters/:id',
+    name: 'character-detail',
+    component: () => import('../views/CharacterDetail.vue'),
   },
   {
-    path: '/about',
-    name: 'about',
-    component: () => import('../views/About.vue'),
+    path: '/records',
+    name: 'records',
+    component: () => import('../views/Records.vue'),
+  },
+  {
+    path: '/records/:id',
+    name: 'record-detail',
+    component: () => import('../views/RecordDetail.vue'),
   },
   {
     path: '/:pathMatch(.*)*',

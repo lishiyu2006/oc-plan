@@ -1,0 +1,47 @@
+[
+  {
+    "id": "region-aurora",
+    "nameEn": "AURORA REACH",
+    "name": "极光谷",
+    "color": "#9ed9dd",
+    "x": -6,
+    "z": -6,
+    "description": "大陆西北的裂谷地带,终年被青蓝色的极光笼罩。谷底的晶簇会在无风的夜里发出低鸣,旅人称其为『大地的耳语』。这里是世界观中『回声』现象的源头。"
+  },
+  {
+    "id": "region-ember",
+    "nameEn": "EMBER WASTES",
+    "name": "余烬荒原",
+    "color": "#e0a458",
+    "x": 7,
+    "z": -4,
+    "description": "旧战争留下的焦土,地表裂缝中仍有暗红的余温。荒原上游荡着拾荒者部族,他们在废墟中挖掘上一个纪元的技术残骸。"
+  },
+  {
+    "id": "region-veil",
+    "nameEn": "VEIL MARSH",
+    "name": "迷雾泽",
+    "color": "#8fb8a8",
+    "x": -4,
+    "z": 6,
+    "description": "东南的低洼沼泽,常年浓雾不散。雾中方向感会失效,只有泽民饲养的『引路灯蛾』能带人穿越。许多失踪者的传说都与此地有关。"
+  },
+  {
+    "id": "region-crown",
+    "nameEn": "CROWN PEAK",
+    "name": "王冠峰",
+    "color": "#cfd4d8",
+    "x": 1,
+    "z": -1,
+    "description": "大陆中心的最高峰,雪线之上建有旧王朝的观星台遗址。登顶者据说能看到极光谷与余烬荒原在同一片天空下相接。"
+  },
+  {
+    "id": "region-hollow",
+    "nameEn": "THE HOLLOW",
+    "name": "空岛",
+    "color": "#b39ddb",
+    "x": 8,
+    "z": 7,
+    "description": "东海外缘一座悬浮的碎岛,引力在这里似乎失效了一半。岛上有无人的石砌环形建筑,用途成谜,是所有故事线最终交汇的地方。"
+  }
+]

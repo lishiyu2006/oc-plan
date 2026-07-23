@@ -60,7 +60,7 @@ router.afterEach(() => {
 
 .bar {
   height: 100%;
-  background: linear-gradient(90deg, var(--rose-light), var(--rose-mid), var(--rose-deep));
+  background: linear-gradient(90deg, #5fb8bd, #9ed9dd);
   border-radius: 0 3px 3px 0;
   transition: width 0.25s ease-out;
 }

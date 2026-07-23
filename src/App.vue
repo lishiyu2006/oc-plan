@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, watch } from 'vue'
-import NavBar from './components/NavBar.vue'
+import SideNav from './components/SideNav.vue'
 import IntroOverlay from './components/IntroOverlay.vue'
 import CookieBanner from './components/CookieBanner.vue'
 import RouteProgress from './components/RouteProgress.vue'
@@ -27,8 +27,8 @@ onMounted(() => {
 <template>
   <RouteProgress />
   <IntroOverlay />
-  <NavBar />
-  <main class="page">
+  <SideNav />
+  <main class="app-main">
     <router-view v-slot="{ Component }">
       <transition name="fade" mode="out-in">
         <component :is="Component" />

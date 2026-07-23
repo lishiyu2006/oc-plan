@@ -1,120 +1,54 @@
 <script setup>
-import { photos, diaryPosts } from '../content'
-import FadeImg from '../components/FadeImg.vue'
-
-const latestPhotos = photos.slice(0, 6)
-const latestPosts = diaryPosts.slice(0, 3)
+// 首页:极简,只保留导航 + 全屏氛围背景(纯 CSS,无文字)
 </script>
 
 <template>
   <div class="home-view">
-    <section class="hero" v-reveal>
-    <p class="eyebrow">PHOTO DIARY</p>
-    <h1>把日子过成<br /><em>可以被翻看的样子</em></h1>
-    <p class="sub">照片与文字,记录那些值得留住的瞬间。</p>
-  </section>
-
-  <h2 class="section-title" v-reveal>最新照片</h2>
-  <div class="photo-grid">
-    <router-link
-      v-for="p in latestPhotos"
-      :key="p.id"
-      to="/photos"
-      class="card photo-card"
-      v-reveal
-    >
-      <div class="thumb"><FadeImg :src="p.url" :alt="p.title" /></div>
-      <div class="meta">
-        <span class="title">{{ p.title }}</span>
-        <span class="date">{{ p.date }}</span>
-      </div>
-    </router-link>
-  </div>
-
-  <h2 class="section-title" v-reveal>最新日记</h2>
-  <div class="post-list">
-    <router-link
-      v-for="post in latestPosts"
-      :key="post.id"
-      :to="`/diary/${post.id}`"
-      class="card post-card"
-      v-reveal
-    >
-      <div v-if="post.cover" class="thumb post-cover">
-        <FadeImg :src="post.cover" :alt="post.title" />
-      </div>
-      <div class="post-body">
-        <span class="date">{{ post.date }}</span>
-        <h3>{{ post.title }}</h3>
-        <p>{{ post.summary }}</p>
-      </div>
-    </router-link>
-  </div>
+    <div class="atmos"></div>
   </div>
 </template>
 
 <style scoped>
-.hero { padding: clamp(1rem, 6vw, 4rem) 0 1rem; }
-
-.eyebrow {
-  letter-spacing: 0.4em;
-  font-size: 0.75rem;
-  color: var(--accent);
-  margin: 0 0 1rem;
+.home-view {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
 }
 
-.hero h1 {
-  font-size: clamp(2rem, 6vw, 3.4rem);
-  line-height: 1.25;
-  margin: 0 0 1.2rem;
-  font-weight: 700;
+.atmos {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(55% 45% at 72% 28%, rgba(158, 217, 221, 0.1), transparent 62%),
+    radial-gradient(40% 38% at 18% 78%, rgba(158, 217, 221, 0.06), transparent 60%),
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 79px,
+      rgba(158, 217, 221, 0.05) 79px 80px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 79px,
+      rgba(158, 217, 221, 0.05) 79px 80px
+    ),
+    var(--bg);
 }
 
-.hero h1 em {
-  font-style: normal;
-  background: linear-gradient(120deg, var(--rose-mid), var(--rose-deep));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+/* 微弱呼吸的氛围光 */
+.atmos::after {
+  content: '';
+  position: absolute;
+  right: 12%;
+  top: 22%;
+  width: 2px;
+  height: 34%;
+  background: linear-gradient(to bottom, transparent, var(--accent), transparent);
+  opacity: 0.35;
+  animation: pulse 4s ease-in-out infinite;
 }
 
-.sub { color: var(--text-soft); font-size: 1.05rem; margin: 0; }
-
-.photo-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 1.2rem;
-}
-
-.photo-card .thumb { aspect-ratio: 3 / 2; }
-
-.meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  padding: 0.75rem 1rem;
-}
-
-.meta .title { font-weight: 600; font-size: 0.95rem; }
-.meta .date { font-size: 0.78rem; color: var(--text-soft); }
-
-.post-list { display: grid; gap: 1.2rem; }
-
-.post-card { display: flex; }
-
-.post-cover {
-  width: 240px;
-  flex-shrink: 0;
-  border-radius: 16px 0 0 16px;
-}
-
-.post-body { padding: 1.2rem 1.5rem; }
-.post-body .date { font-size: 0.78rem; color: var(--accent); letter-spacing: 0.1em; }
-.post-body h3 { margin: 0.4rem 0 0.5rem; font-size: 1.15rem; }
-.post-body p { margin: 0; color: var(--text-soft); font-size: 0.92rem; line-height: 1.7; }
-
-@media (max-width: 640px) {
-  .post-card { flex-direction: column; }
-  .post-cover { width: 100%; aspect-ratio: 16 / 9; border-radius: 16px 16px 0 0; }
+@keyframes pulse {
+  0%, 100% { opacity: 0.15; }
+  50% { opacity: 0.4; }
 }
 </style>

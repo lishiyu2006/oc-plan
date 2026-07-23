@@ -17,7 +17,7 @@ const consent = useConsentStore()
     </div>
     <div class="actions">
       <n-button size="small" @click="consent.choose('necessary')">仅必要</n-button>
-      <n-button size="small" type="primary" color="#c67a7a" @click="consent.choose('all')">
+      <n-button size="small" type="primary" color="#5fb8bd" @click="consent.choose('all')">
         接受
       </n-button>
     </div>
