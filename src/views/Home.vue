@@ -1,26 +1,28 @@
 <script setup>
 import { photos, diaryPosts } from '../content'
+import FadeImg from '../components/FadeImg.vue'
 
 const latestPhotos = photos.slice(0, 6)
 const latestPosts = diaryPosts.slice(0, 3)
 </script>
 
 <template>
-  <section class="hero">
+  <section class="hero" v-reveal>
     <p class="eyebrow">PHOTO DIARY</p>
     <h1>把日子过成<br /><em>可以被翻看的样子</em></h1>
     <p class="sub">照片与文字,记录那些值得留住的瞬间。</p>
   </section>
 
-  <h2 class="section-title">最新照片</h2>
+  <h2 class="section-title" v-reveal>最新照片</h2>
   <div class="photo-grid">
     <router-link
       v-for="p in latestPhotos"
       :key="p.id"
       to="/photos"
       class="card photo-card"
+      v-reveal
     >
-      <div class="thumb"><img :src="p.url" :alt="p.title" loading="lazy" /></div>
+      <div class="thumb"><FadeImg :src="p.url" :alt="p.title" /></div>
       <div class="meta">
         <span class="title">{{ p.title }}</span>
         <span class="date">{{ p.date }}</span>
@@ -28,16 +30,17 @@ const latestPosts = diaryPosts.slice(0, 3)
     </router-link>
   </div>
 
-  <h2 class="section-title">最新日记</h2>
+  <h2 class="section-title" v-reveal>最新日记</h2>
   <div class="post-list">
     <router-link
       v-for="post in latestPosts"
       :key="post.id"
       :to="`/diary/${post.id}`"
       class="card post-card"
+      v-reveal
     >
       <div v-if="post.cover" class="thumb post-cover">
-        <img :src="post.cover" :alt="post.title" loading="lazy" />
+        <FadeImg :src="post.cover" :alt="post.title" />
       </div>
       <div class="post-body">
         <span class="date">{{ post.date }}</span>

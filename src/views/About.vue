@@ -2,7 +2,7 @@
   <div class="about">
     <h1 class="page-title">关于</h1>
 
-    <div class="card block">
+    <div class="card block" v-reveal>
       <h2>这个网站</h2>
       <p>
         一个用照片和日记记录生活的个人小站。照片流按时间排列,日记按篇归档,
@@ -11,7 +11,7 @@
       </p>
     </div>
 
-    <div class="card block">
+    <div class="card block" v-reveal>
       <h2>关于我</h2>
       <p>
         这里写一段自我介绍:你是谁,为什么拍照,为什么写字。
@@ -19,7 +19,7 @@
       </p>
     </div>
 
-    <div class="card block">
+    <div class="card block" v-reveal>
       <h2>联系</h2>
       <p>
         想打个招呼?可以在 GitHub 上找到这个网站的仓库,或者把这里替换成你的邮箱与社交账号。

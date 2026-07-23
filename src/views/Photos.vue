@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { photos, albums } from '../content'
+import FadeImg from '../components/FadeImg.vue'
 
 const activeAlbum = ref('全部')
 
@@ -28,8 +29,8 @@ const filtered = computed(() =>
   </div>
 
   <div class="masonry">
-    <figure v-for="p in filtered" :key="p.id" class="card item">
-      <div class="thumb"><img :src="p.url" :alt="p.title" loading="lazy" /></div>
+    <figure v-for="p in filtered" :key="p.id" class="card item" v-reveal>
+      <div class="thumb"><FadeImg :src="p.url" :alt="p.title" /></div>
       <figcaption class="caption">
         <div class="row">
           <span class="title">{{ p.title }}</span>
@@ -80,6 +81,10 @@ const filtered = computed(() =>
   break-inside: avoid;
   margin: 0 0 1.2rem;
 }
+
+.item .thumb { aspect-ratio: 3 / 2; }
+
+.tab:active { transform: scale(0.97); }
 
 .caption { padding: 0.9rem 1.1rem 1.1rem; }
 

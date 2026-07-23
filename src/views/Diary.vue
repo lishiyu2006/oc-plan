@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { diaryPosts, getReadPosts } from '../content'
+import FadeImg from '../components/FadeImg.vue'
 
 // 已读标记(仅展示;写入发生在详情页,且需用户同意)
 const readIds = ref(getReadPosts())
@@ -16,9 +17,10 @@ const readIds = ref(getReadPosts())
       :key="post.id"
       :to="`/diary/${post.id}`"
       class="card item"
+      v-reveal
     >
       <div v-if="post.cover" class="thumb cover">
-        <img :src="post.cover" :alt="post.title" loading="lazy" />
+        <FadeImg :src="post.cover" :alt="post.title" />
       </div>
       <div class="body">
         <div class="top">

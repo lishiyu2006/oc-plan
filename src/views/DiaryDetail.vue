@@ -3,6 +3,7 @@ import { computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { getPost, markPostRead } from '../content'
 import { useConsentStore } from '../stores/consent'
+import FadeImg from '../components/FadeImg.vue'
 
 const route = useRoute()
 const consent = useConsentStore()
@@ -20,7 +21,7 @@ onMounted(() => {
     <p class="date">{{ post.date }}</p>
     <h1>{{ post.title }}</h1>
     <div v-if="post.cover" class="card cover-card">
-      <img :src="post.cover" :alt="post.title" />
+      <div class="thumb cover-thumb"><FadeImg :src="post.cover" :alt="post.title" /></div>
     </div>
     <!-- 内容由本地 markdown 构建期渲染,非用户输入 -->
     <div class="prose" v-html="post.html"></div>
@@ -57,7 +58,7 @@ h1 {
 }
 
 .cover-card { margin-bottom: 2rem; }
-.cover-card img { width: 100%; }
+.cover-thumb { aspect-ratio: 16 / 9; }
 
 .not-found { text-align: center; padding: 4rem 0; }
 .not-found p { color: var(--text-soft); }

@@ -2,12 +2,12 @@
   --rose-light: #f4d0c7;
   --rose-mid: #e5a6a1;
   --rose-deep: #c67a7a;
-  --bg: #161210;
-  --surface: #1f1a18;
-  --surface-2: #2a2220;
-  --text: #f2e9e6;
-  --text-soft: #b3a19c;
-  --border: #342925;
+  --bg: #131316;
+  --surface: #1b1b20;
+  --surface-2: #232329;
+  --text: #f2f0f4;
+  --text-soft: #a3a3ad;
+  --border: #2a2a32;
   --accent: var(--rose-mid);
 }
 
@@ -82,7 +82,10 @@ input:focus, textarea:focus, select:focus { outline: 1px solid var(--accent); }
   padding: .5rem 1.1rem;
   cursor: pointer;
   font-size: .9rem;
+  transition: background .2s ease-out, border-color .2s ease-out, transform .1s ease-out;
 }
+
+.btn:active { transform: scale(0.97); }
 
 .btn.primary { background: var(--rose-deep); border-color: var(--rose-deep); color: #fff; font-weight: 600; }
 .btn.danger { background: transparent; border-color: #7a3a3a; color: #e08a8a; }
@@ -195,7 +198,7 @@ code { background: var(--surface-2); padding: .1em .4em; border-radius: 5px; fon
 .sync-box p { color: var(--text-soft); }
 
 .output {
-  background: #0e0b0a;
+  background: #0e0e12;
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 1rem 1.2rem;

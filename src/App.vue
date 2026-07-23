@@ -3,6 +3,7 @@ import { onMounted, watch } from 'vue'
 import NavBar from './components/NavBar.vue'
 import IntroOverlay from './components/IntroOverlay.vue'
 import CookieBanner from './components/CookieBanner.vue'
+import RouteProgress from './components/RouteProgress.vue'
 import { useThemeStore } from './stores/theme'
 import { useConsentStore } from './stores/consent'
 
@@ -24,6 +25,7 @@ onMounted(() => {
 </script>
 
 <template>
+  <RouteProgress />
   <IntroOverlay />
   <NavBar />
   <main class="page">

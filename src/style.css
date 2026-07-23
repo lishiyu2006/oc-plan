@@ -1,28 +1,34 @@
-/* ========== 主题变量(主色调来自照片,严格使用) ========== */
+/* ========== 主题变量(主色调来自照片,严格使用;背景为中性冷灰,无棕色) ========== */
 :root {
   --rose-light: #f4d0c7;
   --rose-mid: #e5a6a1;
   --rose-deep: #c67a7a;
 
-  --bg: #faf5f3;
+  --bg: #faf6f7;
   --surface: #ffffff;
-  --text: #2c2422;
-  --text-soft: #7a6a65;
-  --border: #eedfdd;
+  --text: #25242b;
+  --text-soft: #7d767f;
+  --border: #efe2e6;
   --accent: var(--rose-deep);
-  --accent-soft: var(--rose-light);
+  --accent-soft: #f9ecea;
+  --skeleton: #ece3e7;
   --shadow: 0 4px 24px rgba(198, 122, 122, 0.10);
+  --shadow-hover: 0 12px 32px rgba(198, 122, 122, 0.18);
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 [data-theme='dark'] {
-  --bg: #161210;
-  --surface: #1f1a18;
-  --text: #f2e9e6;
-  --text-soft: #b3a19c;
-  --border: #342925;
+  --bg: #131316;
+  --surface: #1b1b20;
+  --text: #f2f0f4;
+  --text-soft: #a3a3ad;
+  --border: #2a2a32;
   --accent: var(--rose-mid);
-  --accent-soft: #2e2320;
+  --accent-soft: #2a2229;
+  --skeleton: #2a2a32;
   --shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+  --shadow-hover: 0 12px 36px rgba(0, 0, 0, 0.5);
 }
 
 /* ========== 基础 ========== */
@@ -50,17 +56,26 @@ img { display: block; max-width: 100%; }
   min-height: calc(100vh - 64px);
 }
 
-/* ========== 通用卡片 ========== */
+/* ========== 通用卡片(悬浮上浮 + 阴影加深;按压回弹) ========== */
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 16px;
   overflow: hidden;
   box-shadow: var(--shadow);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  transition:
+    transform 0.3s var(--ease-out),
+    box-shadow 0.3s var(--ease-out),
+    border-color 0.3s ease;
 }
 
-.card:hover { transform: translateY(-3px); }
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
+  border-color: var(--rose-mid);
+}
+
+.card:active { transform: translateY(-1px) scale(0.97); transition-duration: 0.1s; }
 
 .card .thumb {
   overflow: hidden;
@@ -71,10 +86,10 @@ img { display: block; max-width: 100%; }
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.4s ease;
+  transition: transform 0.45s var(--ease-out), opacity 0.45s ease-out;
 }
 
-.card:hover .thumb img { transform: scale(1.04); }
+.card:hover .thumb img { transform: scale(1.03); }
 
 .section-title {
   font-size: 1.4rem;
@@ -93,10 +108,29 @@ img { display: block; max-width: 100%; }
   background: var(--accent);
 }
 
-/* ========== 路由过渡 ========== */
-.fade-enter-active, .fade-leave-active { transition: opacity 0.2s ease, transform 0.2s ease; }
-.fade-enter-from { opacity: 0; transform: translateY(8px); }
-.fade-leave-to { opacity: 0; }
+/* ========== 路由过渡(旧页面向左淡出,新页面从右淡入) ========== */
+.fade-enter-active {
+  transition: opacity 0.3s ease-out, transform 0.3s var(--ease-out);
+}
+.fade-leave-active {
+  transition: opacity 0.18s ease-out, transform 0.18s ease-out;
+}
+.fade-enter-from { opacity: 0; transform: translateX(16px); }
+.fade-leave-to { opacity: 0; transform: translateX(-16px); }
+
+/* ========== 叙事式滚动(v-reveal 指令) ========== */
+.reveal-init {
+  opacity: 0;
+  transform: translateY(18px);
+}
+
+.reveal-done {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.55s ease-out,
+    transform 0.55s var(--ease-out);
+}
 
 /* ========== 日记正文(marked 渲染) ========== */
 .prose { line-height: 1.9; font-size: 1.02rem; color: var(--text); }
@@ -122,4 +156,15 @@ img { display: block; max-width: 100%; }
 /* ========== 响应式 ========== */
 @media (max-width: 640px) {
   .section-title { font-size: 1.15rem; }
+}
+
+/* ========== 减少动态效果偏好:全部降级/关闭 ========== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .reveal-init { opacity: 1; transform: none; }
+  .fade-enter-from, .fade-leave-to { transform: none; }
 }
