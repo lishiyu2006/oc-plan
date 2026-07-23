@@ -26,6 +26,7 @@ export const useConsentStore = defineStore('consent', {
           // 用户改选"仅必要"时,清除此前写入的偏好数据
           localStorage.removeItem('theme')
           localStorage.removeItem('read-posts')
+          localStorage.removeItem('music-on')
         }
       } catch {
         /* ignore */

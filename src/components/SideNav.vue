@@ -3,8 +3,10 @@ import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { NButton } from 'naive-ui'
 import { useThemeStore } from '../stores/theme'
+import { useMusicStore } from '../stores/music'
 
 const theme = useThemeStore()
+const music = useMusicStore()
 const route = useRoute()
 const open = ref(false)
 
@@ -56,6 +58,16 @@ const isActive = (to) => route.path.startsWith(to)
           {{ theme.dark ? '☀️' : '🌙' }}
         </span>
         <span class="tlabel">{{ theme.dark ? 'LIGHT' : 'DARK' }}</span>
+      </n-button>
+      <n-button
+        quaternary
+        class="theme-btn music-btn"
+        :class="{ playing: music.playing }"
+        :aria-label="music.playing ? '暂停音乐' : '播放音乐'"
+        @click="music.toggle()"
+      >
+        <span class="ticon micon">♪</span>
+        <span class="tlabel">{{ music.playing ? 'MUSIC ON' : 'MUSIC' }}</span>
       </n-button>
     </div>
   </aside>
@@ -171,6 +183,25 @@ const isActive = (to) => route.path.startsWith(to)
   font-size: 0.75rem;
   letter-spacing: 0.25em;
   color: var(--text-soft);
+}
+
+/* ---------- 音乐开关:播放中音符微微跳动 ---------- */
+.music-btn .micon { font-size: 0.95rem; line-height: 1; }
+
+.music-btn.playing .micon {
+  color: var(--accent);
+  animation: note-bounce 0.9s ease-in-out infinite;
+}
+
+.music-btn.playing .tlabel { color: var(--accent); }
+
+@keyframes note-bounce {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-3px) rotate(-8deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .music-btn.playing .micon { animation: none; }
 }
 
 /* ---------- 移动端汉堡 ---------- */

@@ -215,51 +215,77 @@ const wipeEl = ref(null)
 const wipeBd = ref(null)
 let wiping = false
 
-function applyLayer(key) {
-  layer.value = key
-  selected.value = null
-  focused = false
-  const v = LAYER_VIEW[key]
-  // 两段式:先飞到高空中继点,再下降进入目标层,避免穿过地表/地下背板
-  flyTo(SAFE_RELAY.pos, SAFE_RELAY.tgt, 0.7, () => flyTo(v.pos, v.tgt, 0.85))
-}
-
 function switchLayer(key) {
   if (key === layer.value || wiping) return
-  if (reduced) {
-    applyLayer(key) // reduced-motion:跳过擦除动画直接切换
+  const involvesUnder = layer.value === 'underground' || key === 'underground'
+  // 天空↔地表(以及 prefers-reduced-motion):直接切换,无擦除、无相机飞行
+  if (reduced || !involvesUnder) {
+    tween = null
+    layer.value = key
+    selected.value = null
+    focused = false
+    const v = LAYER_VIEW[key]
+    camera.position.set(...v.pos)
+    controls.target.set(...v.tgt)
+    controls.enabled = true
     return
   }
+  // 地上↔地下:笔画擦除动画。扫入 550ms + 全遮停顿 300ms + 扫出 550ms ≈ 1.4s
   wiping = true
   const el = wipeEl.value
   const bd = wipeBd.value
   const W = window.innerWidth
-  const DUR = 1050
+  const T_IN = 550
+  const T_HOLD = 300
+  const T_OUT = 550
+  const TOTAL = T_IN + T_HOLD + T_OUT
   const t0 = performance.now()
   let switched = false
-  const step = (now) => {
-    const t = Math.min(1, (now - t0) / DUR)
-    // 位置曲线:x = 0.5√(2t)(前半)/ 1-0.5√(2(1-t))(后半) → 两端最快,t=0.5 最慢
-    const x = t < 0.5 ? 0.5 * Math.sqrt(2 * t) : 1 - 0.5 * Math.sqrt(2 * (1 - t))
-    // 速度 v = 0.5/√(2u),u 为到最近端点的距离;归一化后用于宽度
-    const u = Math.max(Math.min(t, 1 - t), 0.04)
-    const v = 0.5 / Math.sqrt(2 * u)
+  // x:笔块右缘全局进度(0→1);u:到最近端点距离(决定速度→宽度);bdOp:背板不透明度
+  const paint = (x, u, bdOp) => {
+    // 速度 v = 0.5/√(2u):两端最快(笔块窄 0.15W),t=0.5 最慢(笔块宽 0.55W)
+    const v = 0.5 / Math.sqrt(2 * Math.max(u, 0.04))
     const speedRatio = Math.min(1, (v - 0.5) / 1.27)
-    const w = (0.55 - 0.4 * speedRatio) * W // 宽度与速度成反比:0.15W(快)~0.55W(慢)
+    const w = (0.55 - 0.4 * speedRatio) * W
     el.style.width = w + 'px'
     el.style.transform = `translateX(${x * (W + w) - w}px) skewX(-3deg)`
-    bd.style.opacity = String(0.92 * (1 - Math.abs(t - 0.5) * 2)) // 背景压暗,t=0.5 最强
-    if (!switched && t >= 0.5) {
-      switched = true
-      applyLayer(key) // 全遮瞬间切换 active scene
-    }
-    if (t < 1) requestAnimationFrame(step)
-    else {
+    bd.style.opacity = String(bdOp)
+  }
+  const step = (now) => {
+    const e = now - t0
+    if (e < T_IN) {
+      const s = e / T_IN // 全局进度 0 → 0.5:x = 0.5√(2s)
+      paint(0.5 * Math.sqrt(2 * s), Math.min(s, 1 - s), 0.92 * s)
+    } else if (e < T_IN + T_HOLD) {
+      // 全遮停顿 300ms:笔块停在中点(最宽),背板保持全遮
+      if (!switched) {
+        switched = true
+        layer.value = key
+        selected.value = null
+        focused = false
+        tween = null
+        // 相机先瞬移到高空中继点(避免旧层视角看到新场景"外部"),
+        // 并在遮盖下同步预热渲染目标场景至少一帧(shader 编译/纹理上传在此完成),
+        // 揭开时画面一定完整,不穿模、不黑闪
+        camera.position.set(...SAFE_RELAY.pos)
+        controls.target.set(...SAFE_RELAY.tgt)
+        renderer.render(key === 'underground' ? sceneUnder : sceneTop, camera)
+        const v = LAYER_VIEW[key]
+        flyTo(v.pos, v.tgt, 1.0) // 从中继点下降进入目标层(遮盖下已开始)
+      }
+      paint(0.5, 0.5, 0.92)
+    } else if (e < TOTAL) {
+      const s = (e - T_IN - T_HOLD) / T_OUT // 全局进度 0.5 → 1
+      const t = 0.5 + 0.5 * s
+      paint(1 - 0.5 * Math.sqrt(2 * (1 - t)), Math.min(t, 1 - t), 0.92 * (1 - s))
+    } else {
       el.style.transform = 'translateX(-110vw) skewX(-3deg)'
       el.style.width = '55vw'
       bd.style.opacity = '0'
       wiping = false
+      return
     }
+    requestAnimationFrame(step)
   }
   requestAnimationFrame(step)
 }
