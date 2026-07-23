@@ -53,17 +53,20 @@
 
 ```json
 {
-  "id": "region-xxx",
-  "nameEn": "AURORA REACH",
-  "name": "极光谷",
+  "id": "aria-isles",
+  "name": "风歌浮岛",
+  "nameEn": "ARIA ISLES",
+  "layer": "sky",
   "color": "#9ed9dd",
-  "x": -6,
-  "z": -6,
+  "x": -5,
+  "z": -1,
   "description": "板块介绍……"
 }
 ```
 
-`x` / `z` 是大陆平面坐标(范围约 ±12,中心为 0),标记柱会自动贴合地形高度;`color` 决定浮标发光色。
+- `layer`:`"sky"`(天空)/ `"surface"`(地表)/ `"underground"`(地下),决定板块出现在哪一层以及页面右上角层切换按钮中的归属
+- `x` / `z` 是大陆平面坐标(范围约 ±14,中心为 0),标记柱会自动贴合地形高度;`color` 决定浮标发光色
+- 当前内置 10 个板块(天空 2 / 地表 6 / 地下 2),点击浮标相机会旋转拉近并滑出介绍面板
 
 ### 人物(`content/characters.json`)
 
