@@ -7,7 +7,8 @@ const latestPosts = diaryPosts.slice(0, 3)
 </script>
 
 <template>
-  <section class="hero" v-reveal>
+  <div class="home-view">
+    <section class="hero" v-reveal>
     <p class="eyebrow">PHOTO DIARY</p>
     <h1>把日子过成<br /><em>可以被翻看的样子</em></h1>
     <p class="sub">照片与文字,记录那些值得留住的瞬间。</p>
@@ -48,6 +49,7 @@ const latestPosts = diaryPosts.slice(0, 3)
         <p>{{ post.summary }}</p>
       </div>
     </router-link>
+  </div>
   </div>
 </template>
 

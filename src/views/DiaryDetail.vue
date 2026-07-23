@@ -16,7 +16,8 @@ onMounted(() => {
 </script>
 
 <template>
-  <article v-if="post" class="article">
+  <div class="diary-detail-view">
+    <article v-if="post" class="article">
     <router-link to="/diary" class="back">← 返回日记列表</router-link>
     <p class="date">{{ post.date }}</p>
     <h1>{{ post.title }}</h1>
@@ -27,10 +28,11 @@ onMounted(() => {
     <div class="prose" v-html="post.html"></div>
   </article>
 
-  <div v-else class="not-found">
-    <h1>没有找到这篇日记</h1>
-    <p>它可能已被移动或删除。</p>
-    <router-link to="/diary" class="back">← 返回日记列表</router-link>
+    <div v-else class="not-found">
+      <h1>没有找到这篇日记</h1>
+      <p>它可能已被移动或删除。</p>
+      <router-link to="/diary" class="back">← 返回日记列表</router-link>
+    </div>
   </div>
 </template>
 

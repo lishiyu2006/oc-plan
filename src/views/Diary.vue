@@ -8,10 +8,11 @@ const readIds = ref(getReadPosts())
 </script>
 
 <template>
-  <h1 class="page-title">日记</h1>
-  <p class="page-sub">共 {{ diaryPosts.length }} 篇,按时间倒序。</p>
+  <div class="diary-view">
+    <h1 class="page-title">日记</h1>
+    <p class="page-sub">共 {{ diaryPosts.length }} 篇,按时间倒序。</p>
 
-  <div class="list">
+    <div class="list">
     <router-link
       v-for="post in diaryPosts"
       :key="post.id"
@@ -31,6 +32,7 @@ const readIds = ref(getReadPosts())
         <p>{{ post.summary }}</p>
       </div>
     </router-link>
+    </div>
   </div>
 </template>
 

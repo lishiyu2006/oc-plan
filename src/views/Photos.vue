@@ -13,7 +13,8 @@ const filtered = computed(() =>
 </script>
 
 <template>
-  <h1 class="page-title">相册</h1>
+  <div class="photos-view">
+    <h1 class="page-title">相册</h1>
   <p class="page-sub">按专辑浏览,或下拉查看全部照片。</p>
 
   <div class="album-tabs">
@@ -40,6 +41,7 @@ const filtered = computed(() =>
         <p v-if="p.description" class="desc">{{ p.description }}</p>
       </figcaption>
     </figure>
+  </div>
   </div>
 </template>
 

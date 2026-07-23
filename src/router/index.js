@@ -33,9 +33,20 @@ const routes = [
   },
 ]
 
-export default createRouter({
+const router = createRouter({
   // base 与 vite.config.js 的 base 保持一致(GitHub Pages 子路径部署)
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
   scrollBehavior: () => ({ top: 0 }),
 })
+
+// 兜底:GitHub Pages 重新部署后,旧页面引用的 chunk hash 会失效(404),
+// 懒加载失败时自动整页刷新,拉取最新的 index.html 与资源
+router.onError((error) => {
+  const msg = String(error?.message || error || '')
+  if (/dynamically imported module|module script failed|ChunkLoadError/i.test(msg)) {
+    window.location.reload()
+  }
+})
+
+export default router
