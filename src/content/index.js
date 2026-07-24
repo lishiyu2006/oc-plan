@@ -12,5 +12,9 @@ const BASE = import.meta.env.BASE_URL || '/'
 const withBase = (url) =>
   url && !/^(https?:)?\/\//.test(url) ? BASE + url.replace(/^\/+/, '') : url
 
-export const characters = charactersData.map((c) => ({ ...c, photo: withBase(c.photo) }))
+export const characters = charactersData.map((c) => ({
+  ...c,
+  photo: withBase(c.photo),
+  illustrations: (c.illustrations || []).map(withBase),
+}))
 export const getCharacter = (id) => characters.find((c) => c.id === id)
