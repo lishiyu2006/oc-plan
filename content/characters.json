@@ -24,8 +24,8 @@
     "appearance": "荒原日晒出的暖棕肤色,眉骨上落着淡淡的灰烬晒斑。琥珀色的眼睛总是半眯着,深棕辫子串着几枚铜环,围巾常年半遮住脸。指节上有旧烫痕——她说那是药箱和她握手的方式。",
     "appearancePrompt": "detailed character portrait of a female scavenger medic in her early thirties from an ashen wasteland, warm sun-browned skin with ash-grey sunspots across the brow bone, amber eyes half-squinting, dark brown braids strung with small copper rings, a scarf covering the lower half of her face, a modified old-era instrument case slung across her body as a medicine box, old burn marks on her knuckles, dusty wasteland light, concept art, painterly, muted colors, atmospheric",
     "illustrations": [
-      "https://picsum.photos/seed/oc-qiu-1/1200/800",
-      "https://picsum.photos/seed/oc-qiu-2/1200/800",
+      "characters/illust/qiu-1.jpg",
+      "characters/illust/qiu-2.jpg",
       "characters/illust/qiu-3.jpg"
     ]
   },
@@ -39,9 +39,9 @@
     "appearance": "沼泽幽光里养大的少女,皮肤苍白得近乎透明,沾着极淡的荧光粉尘。银白长发几乎垂到地面,一双深色眼睛大得不像常人,夜里会泛起蛾目般的微光。肩头总停着一只发光的灯蛾,像一盏为她引路的小灯。",
     "appearancePrompt": "detailed character portrait of a pale teenage girl, guide of a mist-shrouded swamp, almost translucent pale skin dusted with faint luminescent powder, extremely long silver-white hair nearly touching the ground, oversized dark eyes with a subtle moth-like reflective sheen, grey-green gauze cloak, a small glowing lantern-moth resting on her shoulder, eerie yet gentle, swamp glimmer background, concept art, painterly, muted colors, atmospheric",
     "illustrations": [
-      "https://picsum.photos/seed/oc-moth-1/1200/800",
-      "https://picsum.photos/seed/oc-moth-2/1200/800",
-      "https://picsum.photos/seed/oc-moth-3/1200/800"
+      "characters/illust/moth-1.jpg",
+      "characters/illust/moth-2.jpg",
+      "characters/illust/moth-3.jpg"
     ]
   },
   {
@@ -54,9 +54,9 @@
     "appearance": "高原日晒的小麦色皮肤,两团明显的高原红晕挂在脸蛋上,鼻尖也泛着红。深色眼睛亮得惊人,圆铜护目镜推在额上,手指沾着星图的墨渍。厚重的层叠长袍裹着她,背上永远背着那只黄铜星盘。",
     "appearancePrompt": "detailed character portrait of a female plateau watcher in her twenties, sun-tanned wheat-colored skin with two distinct highland-red blush patches on her cheeks and a reddened nose tip, bright dark eyes, round copper goggles pushed up on her forehead, star-chart ink stains on her fingers, thick layered Tibetan-style robes, a brass astrolabe strapped to her back, high-altitude clear light, wind-battered observatory ruins background, concept art, painterly, muted colors, atmospheric",
     "illustrations": [
-      "https://picsum.photos/seed/oc-yan-1/1200/800",
-      "https://picsum.photos/seed/oc-yan-2/1200/800",
-      "https://picsum.photos/seed/oc-yan-3/1200/800"
+      "characters/illust/yan-1.jpg",
+      "characters/illust/yan-2.jpg",
+      "characters/illust/yan-3.jpg"
     ]
   }
 ]
