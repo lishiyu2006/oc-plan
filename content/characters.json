@@ -9,9 +9,9 @@
     "appearance": "极北寒地养出的少年,皮肤苍白,鼻尖总带着一点冻红。浅蓝灰的眼眸里像沉着极光的碎色,银灰短发被耳罩压出浅浅的痕。巡逻时睫毛上会挂霜,他也不擦,说是『谷给的勋章』。",
     "appearancePrompt": "detailed character portrait of a 16-18 year old boy, border patrol warden from a far-northern aurora valley, pale skin with a frost-reddened nose tip, light blue-grey eyes reflecting faint aurora greens and violets, frost clinging to his eyelashes, short silver-grey hair with earmuff pressure marks, dark navy patrol cloak decorated with tiny crystal ornaments, quiet resilient expression, cold northern light, concept art, painterly, muted colors, atmospheric",
     "illustrations": [
-      "https://picsum.photos/seed/oc-ling-1/1200/800",
-      "https://picsum.photos/seed/oc-ling-2/1200/800",
-      "https://picsum.photos/seed/oc-ling-3/1200/800"
+      "characters/illust/ling-1.jpg",
+      "characters/illust/ling-2.jpg",
+      "characters/illust/ling-3.jpg"
     ]
   },
   {
@@ -26,7 +26,7 @@
     "illustrations": [
       "https://picsum.photos/seed/oc-qiu-1/1200/800",
       "https://picsum.photos/seed/oc-qiu-2/1200/800",
-      "https://picsum.photos/seed/oc-qiu-3/1200/800"
+      "characters/illust/qiu-3.jpg"
     ]
   },
   {
