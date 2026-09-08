@@ -22,7 +22,7 @@
 ├── admin/                         # 本地管理后台(npm run admin,端口 3777)
 │   └── ...                        # 日记/照片管理仍可用于 content 维护(见下方说明)
 ├── content/
-│   ├── world.json                 # 世界观板块(id/nameEn/name/color/x/z/description)
+│   ├── world.json                 # models(场景模型 URL)+ regions(板块: id/name/nameEn/layer/color/image/description)
 │   ├── characters.json            # 人物(id/name/nameEn/title/photo/intro/illustrations)
 │   ├── photos.json                # (旧照片日记数据,前台已不展示,admin 仍可管理)
 │   └── diary/                     # (旧日记数据,同上)
@@ -36,10 +36,15 @@
 │   │   ├── RouteProgress.vue      # 路由切换顶部进度条
 │   │   ├── FadeImg.vue            # 骨架占位 + 图片淡入
 │   │   └── CookieBanner.vue       # 本地存储许可横幅
+│   ├── three/                     # three.js 引擎(Web 层唯一入口 index.js 导出 World 类)
+│   │   ├── World.js               # 组装者:场景/相机/交互/昼夜/切层/渲染循环
+│   │   ├── config.js              # 层/昼夜/高程常量
+│   │   ├── noise.js               # 程序化高度场(glTF 化后移除)
+│   │   └── components/            # sea/surface/underground/markers(程序化内容)
 │   ├── views/                     # Home / World / Characters / CharacterDetail / Records / RecordDetail
-│   ├── stores/                    # theme.js / consent.js
+│   ├── stores/                    # theme.js / consent.js / music.js
 │   ├── directives/reveal.js       # v-reveal 滚动淡入指令
-│   └── content/index.js           # world.json / characters.json 数据入口
+│   └── content/index.js           # world.json / characters.json 数据入口(models/regions/characters)
 └── vite.config.js                 # base 从 VITE_BASE_PATH 读取
 ```
 
@@ -49,24 +54,32 @@
 
 ## 内容维护
 
-### 世界观板块(`content/world.json`)
+### 世界观(`content/world.json`)
 
-```json
+```jsonc
 {
-  "id": "aria-isles",
-  "name": "风歌浮岛",
-  "nameEn": "ARIA ISLES",
-  "layer": "sky",
-  "color": "#9ed9dd",
-  "x": -5,
-  "z": -1,
-  "description": "板块介绍……"
+  "models": { "top": "…/aetherion-top.glb", "under": "…/aetherion-under.glb" }, // 场景模型 URL,glTF 化后生效
+  "regions": [
+    {
+      "id": "aria-isles",
+      "name": "风歌浮岛",
+      "nameEn": "ARIA ISLES",
+      "layer": "sky",
+      "color": "#9ed9dd",
+      "x": -5, // 过渡期保留;glTF 场景化后删除,位置改由模型内同名锚点(ADR-0001)
+      "z": -1,
+      "image": "world/aria-isles.jpg",
+      "description": "板块介绍……"
+    }
+  ]
 }
 ```
 
+- `models.top` / `models.under`:`top`(天空+地表)/ `under`(地下)场景模型地址,见 ADR-0002
 - `layer`:`"sky"`(天空)/ `"surface"`(地表)/ `"underground"`(地下),决定板块出现在哪一层以及页面右上角层切换按钮中的归属
-- `x` / `z` 是大陆平面坐标(范围约 ±14,中心为 0),标记柱会自动贴合地形高度;`color` 决定浮标发光色
-- 当前内置 10 个板块(天空 2 / 地表 6 / 地下 2),点击浮标相机会旋转拉近并滑出介绍面板
+- `x` / `z`:大陆平面坐标(范围约 ±14,中心为 0),标记柱会自动贴合地形高度;**过渡字段**——程序化地形替换为 glTF 场景后删除,板块位置改由场景内同名锚点(id)决定,见 `docs/adr/0001`
+- `color`:面板标题强调色与浮标发光色(glTF 化后发光色职责移交模型材质)
+- 当前内置 12 个板块(天空 2 / 地表 8 / 地下 2),点击浮标相机会旋转拉近并滑出介绍面板
 
 ### 人物(`content/characters.json`)
 

@@ -7,8 +7,14 @@ const BASE = import.meta.env.BASE_URL || '/'
 const withBase = (url) =>
   url && !/^(https?:)?\/\//.test(url) ? BASE + url.replace(/^\/+/, '') : url
 
-// 世界观板块(content/world.json 驱动)
-export const regions = worldData.map((r) => ({ ...r, image: withBase(r.image) }))
+// 世界观场景模型(world.json.models):top = 天空+地表,under = 地下
+export const worldModels = {
+  top: worldData.models.top ? withBase(worldData.models.top) : '',
+  under: worldData.models.under ? withBase(worldData.models.under) : '',
+}
+
+// 世界观板块(world.json.regions 驱动)
+export const regions = worldData.regions.map((r) => ({ ...r, image: withBase(r.image) }))
 export const getRegion = (id) => regions.find((r) => r.id === id)
 
 // 人物(content/characters.json 驱动)
