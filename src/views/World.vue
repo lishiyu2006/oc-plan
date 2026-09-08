@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import DualTitle from '../components/DualTitle.vue'
+import FadeImg from '../components/FadeImg.vue'
 import { regions } from '../content'
 import { useThemeStore } from '../stores/theme'
 
@@ -1247,6 +1248,10 @@ onBeforeUnmount(() => {
         <div class="fade-strip"></div>
         <aside class="panel">
           <button class="close" aria-label="关闭" @click="unfocus">✕</button>
+          <!-- 概念头图:铺满面板宽,底部渐变融入面板底色;加载前骨架占位 -->
+          <div v-if="selected.image" class="panel-hero">
+            <FadeImg :src="selected.image" :alt="selected.name" />
+          </div>
           <p class="layer-tag">{{ selectedLayerLabel }}</p>
           <div class="dual-title sm">
             <h1 class="en" :style="{ color: selected.color }">{{ selected.nameEn }}</h1>
@@ -1356,6 +1361,24 @@ onBeforeUnmount(() => {
 
 .panel .zh { color: #9a9ea4; }
 
+/* ---------- 面板概念头图 ---------- */
+.panel-hero {
+  position: relative;
+  height: 160px;
+  /* 抵消面板 padding,图片铺满面板整个宽度(含顶部) */
+  margin: -3.2rem -2.2rem 1.6rem;
+  overflow: hidden;
+}
+
+/* 底部渐变淡出,让图融入纯色面板背景(#16181c),不形成硬边 */
+.panel-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 45%, rgba(22, 24, 28, 0.65) 78%, #16181c 100%);
+  pointer-events: none;
+}
+
 .layer-tag {
   display: inline-block;
   margin: 0 0 1.2rem;
@@ -1370,7 +1393,8 @@ onBeforeUnmount(() => {
   position: absolute;
   top: 1.1rem;
   right: 1.1rem;
-  background: none;
+  z-index: 2; /* 压在概念头图之上 */
+  background: rgba(22, 24, 28, 0.55);
   border: 1px solid #2a2e34;
   color: #9a9ea4;
   width: 34px;
@@ -1445,6 +1469,11 @@ onBeforeUnmount(() => {
     overflow: auto;
     padding: 1.6rem 1.4rem 2.2rem;
     clip-path: none;
+  }
+
+  .panel-hero {
+    height: 140px;
+    margin: -1.6rem -1.4rem 1.2rem; /* 对应移动端面板 padding */
   }
 
   .panel-enter-from, .panel-leave-to { transform: translateY(60px); }
