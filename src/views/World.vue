@@ -2,7 +2,7 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import DualTitle from '../components/DualTitle.vue'
 import FadeImg from '../components/FadeImg.vue'
-import { regions } from '../content'
+import { regions, worldModels } from '../content'
 import { useThemeStore } from '../stores/theme'
 import { World } from '../three'
 
@@ -34,6 +34,7 @@ const selected = ref(null)
 const selectedLayerLabel = computed(() =>
   selected.value ? LAYER_LABEL[selected.value.layer] : '',
 )
+const modelError = ref('') // 场景模型加载失败信息
 
 const reduced =
   typeof window.matchMedia === 'function' &&
@@ -44,6 +45,7 @@ let world = null
 onMounted(() => {
   world = new World(host.value, {
     regions,
+    models: worldModels,
     wipeEl: wipeEl.value,
     wipeBd: wipeBd.value,
     reduced,
@@ -54,7 +56,11 @@ onMounted(() => {
     onSelect: (region) => {
       selected.value = region
     },
+    onStatus: (which, ok) => {
+      if (!ok && which === 'top') modelError.value = '场景模型加载失败,请检查 content/world.json 的 models 配置。'
+    },
   })
+  if (import.meta.env.DEV) window.__world = world // dev 调试句柄
 })
 
 onBeforeUnmount(() => {
@@ -94,6 +100,9 @@ watch(
     <!-- 层切换笔画擦除 overlay(盖住一切,pointer-events 不拦截) -->
     <div ref="wipeBd" class="wipe-bd"></div>
     <div ref="wipeEl" class="wipe"></div>
+
+    <!-- 场景模型加载失败提示 -->
+    <div v-if="modelError" class="model-error">{{ modelError }}</div>
 
     <!-- 板块介绍面板:右侧滑出,左边缘渐变衔接场景 -->
     <transition name="panel">
@@ -295,6 +304,23 @@ watch(
     -34px 0 70px 34px #0e0f11; /* 上下/尾部边缘不规则模糊 */
   transform: translateX(-110vw) skewX(-3deg);
   pointer-events: none;
+}
+
+/* ---------- 模型加载错误提示 ---------- */
+.model-error {
+  position: absolute;
+  left: 50%;
+  bottom: 3rem;
+  transform: translateX(-50%);
+  z-index: 40;
+  max-width: 70vw;
+  padding: 0.6rem 1.2rem;
+  background: rgba(22, 24, 28, 0.9);
+  border: 1px solid #e08a6a;
+  color: #f0b0a0;
+  font-size: 0.82rem;
+  letter-spacing: 0.05em;
+  text-align: center;
 }
 
 /* ---------- 移动端 ---------- */

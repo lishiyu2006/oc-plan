@@ -58,7 +58,7 @@
 
 ```jsonc
 {
-  "models": { "top": "…/aetherion-top.glb", "under": "…/aetherion-under.glb" }, // 场景模型 URL,glTF 化后生效
+  "models": { "top": "…/aetherion-top.glb", "under": "…/aetherion-under.glb" },
   "regions": [
     {
       "id": "aria-isles",
@@ -66,8 +66,6 @@
       "nameEn": "ARIA ISLES",
       "layer": "sky",
       "color": "#9ed9dd",
-      "x": -5, // 过渡期保留;glTF 场景化后删除,位置改由模型内同名锚点(ADR-0001)
-      "z": -1,
       "image": "world/aria-isles.jpg",
       "description": "板块介绍……"
     }
@@ -77,9 +75,10 @@
 
 - `models.top` / `models.under`:`top`(天空+地表)/ `under`(地下)场景模型地址,见 ADR-0002
 - `layer`:`"sky"`(天空)/ `"surface"`(地表)/ `"underground"`(地下),决定板块出现在哪一层以及页面右上角层切换按钮中的归属
-- `x` / `z`:大陆平面坐标(范围约 ±14,中心为 0),标记柱会自动贴合地形高度;**过渡字段**——程序化地形替换为 glTF 场景后删除,板块位置改由场景内同名锚点(id)决定,见 `docs/adr/0001`
-- `color`:面板标题强调色与浮标发光色(glTF 化后发光色职责移交模型材质)
-- 当前内置 12 个板块(天空 2 / 地表 8 / 地下 2),点击浮标相机会旋转拉近并滑出介绍面板
+- `image`:板块概念头图(介绍面板顶部展示)
+- `color`:面板标题强调色(发光色职责已移交模型材质,见 ADR-0001)
+- 板块在 3D 场景中的位置由**同名锚点**决定:模型内节点名 = 板块 id(ADR-0001),不再存坐标
+- 当前内置 12 个板块(天空 2 / 地表 8 / 地下 2),点击场景内板块实体相机会旋转拉近并滑出介绍面板
 
 ### 人物(`content/characters.json`)
 

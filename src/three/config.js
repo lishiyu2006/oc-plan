@@ -4,15 +4,6 @@ import { Color } from 'three'
  * AETHERION 世界常量 —— 全部纯数据,零副作用
  * ================================================================ */
 
-// ---------- 高程与布局常量 ----------
-export const H_SCALE = 6
-export const SKY_Y = 14
-export const UNDER_DOME_Y = -8
-export const UNDER_SEA_Y = -20
-
-// 古境王门离岛(与大陆分离的第二块小陆地)
-export const ISLE = { x: 20, z: -8, r: 4.6 }
-
 // ---------- 层定义 ----------
 export const LAYERS = [
   { key: 'sky', en: 'SKY', zh: '天空' },

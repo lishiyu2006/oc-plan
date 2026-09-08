@@ -1,7 +1,7 @@
 {
   "models": {
-    "top": "",
-    "under": ""
+    "top": "world/models/aetherion-top.glb",
+    "under": "world/models/aetherion-under.glb"
   },
   "regions": [
     {
@@ -10,8 +10,6 @@
       "nameEn": "ARIA ISLES",
       "layer": "sky",
       "color": "#9ed9dd",
-      "x": -5,
-      "z": -1,
       "image": "world/aria-isles.jpg",
       "description": "被风魔晶托起的群岛,静静悬浮于大陆之上的流风里。岛屿之间以光桥相连,踏上去会听见桥身发出竖琴般的嗡鸣。吟游诗人在此收集风的声音,再把它们编成只有云层才懂的歌。"
     },
@@ -21,8 +19,6 @@
       "nameEn": "CELEST BEACON",
       "layer": "sky",
       "color": "#b8e6e9",
-      "x": 5,
-      "z": 3,
       "image": "world/celest-beacon.jpg",
       "description": "大陆最高处的古老灯塔,没有人知道它由谁点燃。光束刺破虚空,为迷失于层与层之间的旅人指路。守塔人只留下一句话:『光不是为了照亮路,而是为了让你知道还有人醒着。』"
     },
@@ -32,8 +28,6 @@
       "nameEn": "FROSTWHISPER",
       "layer": "surface",
       "color": "#a8d8e8",
-      "x": 2,
-      "z": -8,
       "image": "world/frostwhisper.jpg",
       "description": "永冻的北境,冰层中封存着上古时代的魔法。把耳朵贴在冰面上,能听见千年前咒文的回响,像有人在冰下缓慢地翻动一本厚重的书。冰原的居民相信,真正的咒语从未消失,只是在等一个配得上它的听众。"
     },
@@ -43,8 +37,6 @@
       "nameEn": "THE RIM",
       "layer": "surface",
       "color": "#e8e4d8",
-      "x": 24,
-      "z": 6,
       "image": "world/the-rim.jpg",
       "description": "大陆的边缘,海水到这里化作光雨,安静地坠入虚空。传说越界者并不会坠落,而是会从世界的另一侧归来——因为艾瑟里昂是一个『环』,所有的尽头都是另一端的开端。雾之壁前立满旅人留下的石堆,每一座都刻着同一句话:我会回来。"
     },
@@ -54,8 +46,6 @@
       "nameEn": "ARCANUM",
       "layer": "surface",
       "color": "#c9a8e8",
-      "x": 0,
-      "z": -1,
       "image": "world/arcanum.jpg",
       "description": "大陆中央的尖塔之城,七座魔导塔构成覆盖全大陆的魔网枢纽。昼夜不灭的奥术辉光把城市的轮廓映在云上,远远看去像另一座倒悬的城。这里的居民习惯用魔力点亮街灯,也习惯在谈论天气之前先谈论魔潮的涨落。"
     },
@@ -65,8 +55,6 @@
       "nameEn": "MOONWHISPER FOREST",
       "layer": "surface",
       "color": "#7db89a",
-      "x": -5,
-      "z": 4,
       "image": "world/moonwhisper.jpg",
       "description": "树木会在月光下低语的森林,萤火是森林的眼睛。夜行的人会听见头顶的枝叶交换着古老的句子,却从来听不清内容——森林只对睡着的人讲完整的故事。迷路者不必担心,萤火会把你送到林缘,然后目送你离开。"
     },
@@ -76,8 +64,6 @@
       "nameEn": "ASHENDRAKE RIDGE",
       "layer": "surface",
       "color": "#e08a6a",
-      "x": 6,
-      "z": -3,
       "image": "world/ashendrake.jpg",
       "description": "沉眠的巨龙化作的火山群,岩浆是它尚未冷却的血脉。山体偶尔震动,山民说那是龙在梦里翻身。龙脊上的矿石带着余温,铁匠们远道而来,只为锻出一块『会呼吸的铁』。"
     },
@@ -87,8 +73,6 @@
       "nameEn": "STARFALL WASTES",
       "layer": "surface",
       "color": "#d8c89a",
-      "x": -6,
-      "z": -5,
       "image": "world/starfall.jpg",
       "description": "陨星砸出的荒原,碎石中嵌着仍在脉动的星核碎片,像大地身上未愈的萤火伤口。夜里碎片会与星空遥相闪烁,仿佛落下的星星还在试图回家。拾星者在此扎营,把碎片磨成灯,据说能照见人心底最亮的地方。"
     },
@@ -98,8 +82,6 @@
       "nameEn": "KINGSGATE",
       "layer": "surface",
       "color": "#c8b890",
-      "x": 22.2,
-      "z": -6.6,
       "image": "world/kingsgate.jpg",
       "description": "孤悬大陆之外海上的巨石之门,两根风化石柱撑起断裂的门楣,门内悬着一轮微光圆环。门楣上方的高空悬浮着一只永不停转的巨环——据说那是上古王庭留下的异界通道,巨环每转满一周,门后便换一个新的世界。没有船能在这座岛靠岸,王门只为自己选中的人开门。"
     },
@@ -109,8 +91,6 @@
       "nameEn": "SUNDERWALL",
       "layer": "surface",
       "color": "#8fa8a0",
-      "x": 9.5,
-      "z": -1.5,
       "image": "world/sunderwall.jpg",
       "description": "横亘在苍垒高原边缘的巨墙,上古为抵御『雾之壁外的注视者』而建。墙体风化出巨大的拱门,旅人从门下穿过时,风声像墙在念自己的名字。如今墙后只剩云海,和两座再也望不到尽头的断塔。"
     },
@@ -120,8 +100,6 @@
       "nameEn": "UMBRAL SEA",
       "layer": "underground",
       "color": "#4a7a9e",
-      "x": 2,
-      "z": 3,
       "image": "world/umbral-sea.jpg",
       "description": "大陆之下倒悬的海,洞顶的晶穹就是『地下的天空』。海水里浮着含魔力的微光生物,潮起潮落之间,海岸泛着幽蓝的光。通过地表的巨坑『落潮井』与地表相连——涨潮时,井里会传出海的歌声。"
     },
@@ -131,8 +109,6 @@
       "nameEn": "CRYSTAL VAULT",
       "layer": "underground",
       "color": "#9a8ae8",
-      "x": -3,
-      "z": -2,
       "image": "world/crystal-vault.jpg",
       "description": "暗海上方的倒悬结晶穹顶,无数晶簇自洞顶垂落,是暗海唯一的光源,也是全大陆魔力的地下根系。晶簇会随魔潮涨落变换颜色,地表的每一次施法,都会在这里激起一圈极轻的光纹。守晶人说:洞窟不是大陆的地下室,是它的心脏。"
     }
