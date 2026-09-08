@@ -24,6 +24,6 @@ Status: accepted (2026-09-08, 重构拷问定稿)
 
 - `world.json` 升级为对象:`models`(top/under URL)+ `regions`(删 x/z,保留 color 供 UI 强调色);`src/content` 与 admin 同步改。
 - `World.vue` 中程序化生成代码(地形/树/桥/晶簇/王门等 build*)删除或归档,引擎骨架(场景、相机、flyTo、切层、拾取框架、昼夜灯)抽入 `src/three/` 模块导出。
-- 锚点命名是前端与建模侧的契约:id 即节点名;缺失锚点只警告对应板块,不炸整个场景。
+- 锚点命名是前端与建模侧的契约:id 即节点名;缺失锚点只影响对应板块(无点击目标、不报错),不影响其他板块与整个场景。实现注记:World 加载后 traverse 场景,把名字匹配板块 id 的节点登记为 landmark,该节点的 mesh 进入拾取列表(2026-09-08 M3 落地)。
 - 渲染场景 `top`(天空+地表)与 `under`(地下)保持现有 sceneTop/sceneUnder 拓扑,切层动画/相机中继逻辑不动。
 - 资产命名 `aetherion-top.glb` / `aetherion-under.glb`,见 ADR-0002 托管管线。
