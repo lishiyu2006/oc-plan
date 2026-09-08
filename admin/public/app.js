@@ -253,6 +253,50 @@ async function uploadFiles(files) {
   await fillCoverPicker()
 }
 
+/* ================= 模型 ================= */
+async function loadModels() {
+  const { models } = await api('/api/models')
+  $('#model-top-url').textContent = models.top || '(未设置,使用占位模型)'
+  $('#model-under-url').textContent = models.under || '(未设置,使用占位模型)'
+  $('#model-top-url').title = models.top || ''
+  $('#model-under-url').title = models.under || ''
+}
+
+async function uploadModel(file, target) {
+  if (!file) return
+  const status = $('#model-status')
+  const lower = file.name.toLowerCase()
+  if (!lower.endsWith('.glb') && !lower.endsWith('.gltf')) {
+    status.textContent = '仅支持 .glb / .gltf 文件'
+    return
+  }
+  if (file.size > 20 * 1024 * 1024) {
+    status.textContent = `文件 ${(file.size / 1024 / 1024).toFixed(1)}MB 超过 20MB 上限(ADR-0002)`
+    return
+  }
+  status.textContent = `正在上传 ${file.name} → ${target} …`
+  try {
+    const base64 = await fileToBase64(file)
+    const r = await api('/api/models', {
+      method: 'POST',
+      body: { filename: file.name, base64, target },
+    })
+    status.textContent = `已上传并写回 world.json ✓\n${r.url}`
+    await loadModels()
+  } catch (e) {
+    status.textContent = `上传失败:${e.message}`
+  }
+}
+
+$('#file-top').addEventListener('change', () => {
+  uploadModel($('#file-top').files[0], 'top')
+  $('#file-top').value = ''
+})
+$('#file-under').addEventListener('change', () => {
+  uploadModel($('#file-under').files[0], 'under')
+  $('#file-under').value = ''
+})
+
 /* ================= 同步 ================= */
 $('#btn-sync').addEventListener('click', async () => {
   const btn = $('#btn-sync')
@@ -272,4 +316,5 @@ $('#btn-sync').addEventListener('click', async () => {
 /* ---------- 启动 ---------- */
 loadDiaryList()
 checkToken()
+loadModels()
 fillCoverPicker()

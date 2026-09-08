@@ -16,6 +16,7 @@ const DIARY_DIR = path.join(ROOT, 'content', 'diary')
 const PHOTOS_JSON = path.join(ROOT, 'content', 'photos.json')
 const CONFIG_PATH = path.join(__dirname, 'config.local.json')
 const PUBLIC_DIR = path.join(__dirname, 'public')
+const WORLD_JSON = path.join(ROOT, 'content', 'world.json')
 const PORT = 3777
 
 // 图床目标(固定)
@@ -179,14 +180,14 @@ async function ghRequest(method, apiPath, body, token) {
   })
 }
 
-async function uploadToGitHub(filename, base64, token) {
+async function uploadToGitHub(filename, base64, token, dir = GH_DIR) {
   let name = path.basename(filename).replace(/[^\w.-]+/g, '-')
-  if (!/\.[a-z0-9]+$/i.test(name)) name += '.jpg'
+  if (!/\.[a-z0-9]+$/i.test(name)) name += dir === GH_DIR ? '.jpg' : '.glb'
 
   // 文件名冲突检测:已存在则加时间戳前缀
   const check = await ghRequest(
     'GET',
-    `/repos/${GH_REPO}/contents/${GH_DIR}/${name}?ref=${GH_BRANCH}`,
+    `/repos/${GH_REPO}/contents/${dir}/${name}?ref=${GH_BRANCH}`,
     null,
     token,
   )
@@ -195,7 +196,7 @@ async function uploadToGitHub(filename, base64, token) {
 
   const put = await ghRequest(
     'PUT',
-    `/repos/${GH_REPO}/contents/${GH_DIR}/${name}`,
+    `/repos/${GH_REPO}/contents/${dir}/${name}`,
     { message: `Upload ${name} via admin panel`, content: base64, branch: GH_BRANCH },
     token,
   )
@@ -204,7 +205,17 @@ async function uploadToGitHub(filename, base64, token) {
     throw new Error(`GitHub 上传失败(HTTP ${put.status}):${text.slice(0, 200)}`)
   }
   await put.arrayBuffer().catch(() => {})
-  return { name, url: `${CDN_BASE}/${name}` }
+  const cdnBase = `https://cdn.jsdelivr.net/gh/${GH_REPO}@${GH_BRANCH}/${dir}`
+  return { name, url: `${cdnBase}/${name}` }
+}
+
+/* ---------------- 世界场景模型 ---------------- */
+function readWorld() {
+  return JSON.parse(fs.readFileSync(WORLD_JSON, 'utf8'))
+}
+
+function writeWorld(world) {
+  fs.writeFileSync(WORLD_JSON, JSON.stringify(world, null, 2) + '\n')
 }
 
 /* ---------------- 静态文件 ---------------- */
@@ -340,6 +351,37 @@ const server = http.createServer(async (req, res) => {
       list.push(entry)
       writePhotos(list)
       return json(res, 200, { ok: true, entry })
+    }
+
+    // 世界场景模型:读当前配置
+    if (p === '/api/models' && req.method === 'GET') {
+      const world = readWorld()
+      return json(res, 200, { ok: true, models: world.models || {} })
+    }
+
+    // 世界场景模型:上传 GLB 到图床 models/ 目录并写回 world.json
+    if (p === '/api/models' && req.method === 'POST') {
+      const token = loadConfig()?.githubToken
+      if (!token) return json(res, 401, { error: '未配置 GitHub token,请先在页面上填写' })
+
+      const b = JSON.parse((await readBody(req)).toString('utf8') || '{}')
+      if (!b.filename || !b.base64) return json(res, 400, { error: '缺少 filename 或 base64' })
+      if (!['top', 'under'].includes(b.target)) return json(res, 400, { error: 'target 必须是 top 或 under' })
+
+      const lower = String(b.filename).toLowerCase()
+      if (!lower.endsWith('.glb') && !lower.endsWith('.gltf'))
+        return json(res, 400, { error: '仅支持 .glb / .gltf 模型文件' })
+      // jsDelivr 单文件上限 20MB(ADR-0002)
+      const bytes = Buffer.from(b.base64, 'base64').length
+      if (bytes > 20 * 1024 * 1024)
+        return json(res, 400, { error: `文件 ${(bytes / 1024 / 1024).toFixed(1)}MB 超过 jsDelivr 20MB 上限,请压缩后重试(ADR-0002)` })
+
+      const { name, url } = await uploadToGitHub(b.filename, b.base64, token, 'models')
+      const world = readWorld()
+      world.models = world.models || {}
+      world.models[b.target] = url
+      writeWorld(world)
+      return json(res, 200, { ok: true, target: b.target, name, url })
     }
 
     // 一键同步

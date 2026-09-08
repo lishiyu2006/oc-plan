@@ -16,6 +16,7 @@
   <nav class="tabs">
     <button class="tab active" data-tab="diary">日记</button>
     <button class="tab" data-tab="photos">照片</button>
+    <button class="tab" data-tab="models">模型</button>
     <button class="tab" data-tab="sync">同步</button>
   </nav>
 
@@ -69,6 +70,35 @@
     <div id="upload-status" class="status"></div>
 
     <div id="photo-grid" class="photo-grid"></div>
+  </section>
+
+  <!-- ========== 模型 ========== -->
+  <section id="tab-models" class="panel">
+    <div id="model-token-form" class="token-form" hidden>
+      <strong>未配置 GitHub token</strong>
+      <p>上传模型需要 GitHub token(与照片上传同一个)。</p>
+    </div>
+
+    <div class="models-box">
+      <p class="dim">大陆场景模型分两个文件(ADR-0001):<code>top</code> = 天空+地表,<code>under</code> = 地下。<br>
+        板块位置靠模型内<b>同名锚点</b>(节点名 = 板块 id);上传后 URL 自动写回 <code>content/world.json</code> 的 models 字段。<br>
+        单文件 ≤20MB(jsDelivr 上限,ADR-0002),建议 GLB + draco/meshopt 压缩后导出。</p>
+      <div class="model-row">
+        <span class="model-tag">top(天空+地表)</span>
+        <span id="model-top-url" class="model-url">(未设置,使用占位模型)</span>
+        <label class="btn">上传替换
+          <input id="file-top" type="file" accept=".glb,.gltf" hidden />
+        </label>
+      </div>
+      <div class="model-row">
+        <span class="model-tag">under(地下)</span>
+        <span id="model-under-url" class="model-url">(未设置,使用占位模型)</span>
+        <label class="btn">上传替换
+          <input id="file-under" type="file" accept=".glb,.gltf" hidden />
+        </label>
+      </div>
+      <div id="model-status" class="status"></div>
+    </div>
   </section>
 
   <!-- ========== 同步 ========== -->

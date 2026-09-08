@@ -193,6 +193,39 @@ code { background: var(--surface-2); padding: .1em .4em; border-radius: 5px; fon
 .photo-card .ops { display: flex; gap: .5rem; align-items: center; margin-top: .2rem; }
 .photo-card .note { font-size: .7rem; color: var(--text-soft); }
 
+/* ---------- 模型 ---------- */
+.models-box { max-width: 760px; display: grid; gap: .9rem; }
+.models-box .dim { color: var(--text-soft); font-size: .85rem; line-height: 1.8; }
+.models-box code { background: var(--surface-2); padding: .1rem .35rem; border-radius: 4px; }
+
+.model-row {
+  display: flex;
+  align-items: center;
+  gap: .8rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: .8rem 1rem;
+}
+
+.model-tag {
+  font-weight: 600;
+  white-space: nowrap;
+  font-size: .9rem;
+}
+
+.model-url {
+  flex: 1;
+  font-size: .72rem;
+  color: var(--text-soft);
+  word-break: break-all;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.models-box .btn { margin-left: auto; white-space: nowrap; cursor: pointer; }
+
 /* ---------- 同步 ---------- */
 .sync-box { max-width: 760px; display: grid; gap: 1rem; }
 .sync-box p { color: var(--text-soft); }
