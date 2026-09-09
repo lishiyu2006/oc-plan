@@ -9,3 +9,8 @@ Thumbs.db
 !.vscode/extensions.json
 *.log
 .idea/
+
+# agent 协作文档:仅本地,不入库不推送(用户决定 2026-09-08)
+/AGENTS.md
+/CONTEXT.md
+/docs/
